@@ -13,6 +13,7 @@
 		7280216B2A3C24C700519337 /* MVCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7280216A2A3C24C700519337 /* MVCViewController.swift */; };
 		728021702A3C24C800519337 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7280216F2A3C24C800519337 /* Assets.xcassets */; };
 		728021732A3C24C800519337 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 728021712A3C24C800519337 /* LaunchScreen.storyboard */; };
+		7288EC7E2A3D91EA00889332 /* MovieSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7288EC7D2A3D91EA00889332 /* MovieSearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		7280216F2A3C24C800519337 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		728021722A3C24C800519337 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		728021742A3C24C800519337 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7288EC7D2A3D91EA00889332 /* MovieSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieSearchView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 				728021682A3C24C700519337 /* SceneDelegate.swift */,
 				7280216A2A3C24C700519337 /* MVCViewController.swift */,
 				721F742B2A3C4AEF00012F1A /* MVVMViewController.swift */,
+				7288EC7D2A3D91EA00889332 /* MovieSearchView.swift */,
 				7280216F2A3C24C800519337 /* Assets.xcassets */,
 				728021712A3C24C800519337 /* LaunchScreen.storyboard */,
 				728021742A3C24C800519337 /* Info.plist */,
@@ -137,6 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7288EC7E2A3D91EA00889332 /* MovieSearchView.swift in Sources */,
 				7280216B2A3C24C700519337 /* MVCViewController.swift in Sources */,
 				728021672A3C24C700519337 /* AppDelegate.swift in Sources */,
 				728021692A3C24C700519337 /* SceneDelegate.swift in Sources */,
