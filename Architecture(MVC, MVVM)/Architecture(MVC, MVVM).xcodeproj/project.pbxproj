@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		721F742C2A3C4AEF00012F1A /* MVVMViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721F742B2A3C4AEF00012F1A /* MVVMViewController.swift */; };
+		722366D12A414EAA00D1AB76 /* NetworkingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722366D02A414EAA00D1AB76 /* NetworkingManager.swift */; };
 		728021672A3C24C700519337 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728021662A3C24C700519337 /* AppDelegate.swift */; };
 		728021692A3C24C700519337 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728021682A3C24C700519337 /* SceneDelegate.swift */; };
 		7280216B2A3C24C700519337 /* MVCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7280216A2A3C24C700519337 /* MVCViewController.swift */; };
@@ -19,6 +20,7 @@
 
 /* Begin PBXFileReference section */
 		721F742B2A3C4AEF00012F1A /* MVVMViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MVVMViewController.swift; sourceTree = "<group>"; };
+		722366D02A414EAA00D1AB76 /* NetworkingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingManager.swift; sourceTree = "<group>"; };
 		728021632A3C24C700519337 /* Architecture(MVC, MVVM).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Architecture(MVC, MVVM).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		728021662A3C24C700519337 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		728021682A3C24C700519337 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 		72BCA1DA2A401E5B0013AA1A /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				722366D02A414EAA00D1AB76 /* NetworkingManager.swift */,
 				72BCA1DB2A401E6C0013AA1A /* EndPoint.swift */,
 			);
 			path = Networking;
@@ -157,6 +160,7 @@
 				728021672A3C24C700519337 /* AppDelegate.swift in Sources */,
 				728021692A3C24C700519337 /* SceneDelegate.swift in Sources */,
 				721F742C2A3C4AEF00012F1A /* MVVMViewController.swift in Sources */,
+				722366D12A414EAA00D1AB76 /* NetworkingManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

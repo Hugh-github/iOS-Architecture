@@ -12,13 +12,13 @@
 import Foundation
 
 struct EndPoint {
-    private let base: String
+    private let base: BaseURL
     private let query: RequestQuery
     private let method: HTTPMethod
     private let header: [HeaderComponents]? // 모든 case에서 header가 반드시 필요한 것은 아니다.
     
     init(
-        base: String,
+        base: BaseURL,
         query: RequestQuery,
         method: HTTPMethod,
         header: [HeaderComponents]? = nil
@@ -30,7 +30,7 @@ struct EndPoint {
     }
     
     private var baseURL: URL? {
-        return URL(string: base)
+        return URL(string: base.rawValue)
     }
     
     // MARK: 세분화 작업 필요(추상화 or 함수 분리)
@@ -65,10 +65,25 @@ struct EndPoint {
     }
 }
 
+enum BaseURL: String {
+    case naverSearch = "https://openapi.naver.com/v1/search/movie.json"
+}
+
 struct RequestQuery {
     private let movieName: String
     private let genre: Genre?
     private let country: Country?
+    
+    init(
+        movieName: String,
+        genre: Genre?,
+        country: Country?
+    ) {
+        self.movieName = movieName
+        self.genre = genre
+        self.country = country
+    }
+    
     
     var parameter: [String: String?] {
         return ["query": movieName, "genre": genre?.rawValue, "country": country?.rawValue]
@@ -77,11 +92,6 @@ struct RequestQuery {
 
 enum HTTPMethod: String {
     case get = "GET"
-}
-
-enum HeaderComponents {
-    case clientID(_ id: String)
-    case clientSecret(_ secret: String)
 }
 
 enum Genre: String {
@@ -95,4 +105,16 @@ enum Country: String {
     case korea = "KR"
     case usa = "US"
     case japan = "JP"
+}
+
+// 두개를 묶어서 어떻게 처리할지 고민
+
+enum HeaderComponents {
+    case clientID(_ id: String)
+    case clientSecret(_ secret: String)
+}
+
+struct EssentailHeader {
+    let clientID = "1RYp_vWiUKUPApHEhCCI"
+    let clientSecret = "ugjer6esDS"
 }
