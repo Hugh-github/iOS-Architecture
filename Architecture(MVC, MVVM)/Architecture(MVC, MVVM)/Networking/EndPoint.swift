@@ -15,7 +15,7 @@ struct EndPoint {
     private let base: BaseURL
     private let query: RequestQuery
     private let method: HTTPMethod
-    private let header: EssentailHeader // 모든 case에서 header가 반드시 필요한 것은 아니다.
+    private let header: EssentailHeader
     
     init(
         base: BaseURL,
@@ -33,12 +33,11 @@ struct EndPoint {
         return URL(string: base.rawValue)
     }
     
-    // MARK: 세분화 작업 필요(추상화 or 함수 분리)
     func getRequest() -> URLRequest? {
         guard var url = baseURL else { return nil }
         var items = [URLQueryItem]()
         
-        // parameter 추가 (query 부분 살짝 고민 해보자)
+        // parameter 추가
         self.query.parameter.forEach { (parameter, value) in
             items.append(URLQueryItem(name: parameter, value: value))
         }
@@ -65,19 +64,29 @@ enum BaseURL: String {
 
 struct RequestQuery {
     private let itemName: String
-    private let sort: Sort
+    private let sort: Sort?
     
     init(
         itemName: String,
-        sort: Sort
+        sort: Sort? = nil
     ) {
         self.itemName = itemName
         self.sort = sort
     }
     
     
-    var parameter: [String: String?] {
-        return ["query": itemName, "sort": sort.rawValue]
+    var parameter: [String: String] {
+        return createParameterDict()
+    }
+    
+    private func createParameterDict() -> [String: String] {
+        var parameter = ["query": itemName]
+        
+        if let description = sort?.rawValue {
+            parameter.updateValue(description, forKey: "sort")
+        }
+        
+        return parameter
     }
 }
 
@@ -91,8 +100,6 @@ enum Sort: String {
 enum HTTPMethod: String {
     case get = "GET"
 }
-
-// 두개를 묶어서 어떻게 처리할지 고민
 
 struct EssentailHeader {
     let clientID = "1RYp_vWiUKUPApHEhCCI"

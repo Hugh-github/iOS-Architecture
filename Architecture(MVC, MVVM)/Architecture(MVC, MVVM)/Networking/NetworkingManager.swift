@@ -21,16 +21,41 @@ class NetworkingManager {
         return URLSession.shared
     }
     
-    // 서버에 데이터 요청
-    func excute(endPoint: EndPoint) async throws -> Data {
+    func execute(endPoint: EndPoint) async throws -> Data {
         guard let request = endPoint.getRequest() else { throw NetworkingError.badRequest }
-        let (data, _) = try await urlSession.data(for: request)
+        let (data, response) = try await urlSession.data(for: request)
+        try handleResponse(response)
         
-        print(data)
         return data
+    }
+    
+    private func handleResponse(_ response: URLResponse) throws {
+        guard let urlResponse = response as? HTTPURLResponse else {
+            throw NetworkingError.unknownError
+        }
+        
+        let code = urlResponse.statusCode
+        
+        switch code {
+        case 100...199:
+            return
+        case 200...299:
+            return
+        case 300...399:
+            throw NetworkingError.clientError
+        case 400...499:
+            throw NetworkingError.serverError
+        default:
+            throw NetworkingError.systemError
+        }
+        
     }
 }
 
 enum NetworkingError: Error {
     case badRequest
+    case unknownError
+    case clientError
+    case serverError
+    case systemError
 }
