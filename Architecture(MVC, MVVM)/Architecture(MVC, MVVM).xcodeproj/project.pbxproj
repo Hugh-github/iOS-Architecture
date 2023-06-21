@@ -15,6 +15,7 @@
 		728021702A3C24C800519337 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7280216F2A3C24C800519337 /* Assets.xcassets */; };
 		728021732A3C24C800519337 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 728021712A3C24C800519337 /* LaunchScreen.storyboard */; };
 		7288EC7E2A3D91EA00889332 /* MovieSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7288EC7D2A3D91EA00889332 /* MovieSearchView.swift */; };
+		729CE86A2A41CB2B00478D89 /* ItemDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CE8692A41CB2B00478D89 /* ItemDTO.swift */; };
 		72BCA1DC2A401E6C0013AA1A /* EndPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BCA1DB2A401E6C0013AA1A /* EndPoint.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 		728021722A3C24C800519337 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		728021742A3C24C800519337 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7288EC7D2A3D91EA00889332 /* MovieSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieSearchView.swift; sourceTree = "<group>"; };
+		729CE8692A41CB2B00478D89 /* ItemDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDTO.swift; sourceTree = "<group>"; };
 		72BCA1DB2A401E6C0013AA1A /* EndPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndPoint.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -66,8 +68,9 @@
 				728021682A3C24C700519337 /* SceneDelegate.swift */,
 				7280216A2A3C24C700519337 /* MVCViewController.swift */,
 				721F742B2A3C4AEF00012F1A /* MVVMViewController.swift */,
-				72BCA1DA2A401E5B0013AA1A /* Networking */,
 				7288EC7D2A3D91EA00889332 /* MovieSearchView.swift */,
+				72BCA1DA2A401E5B0013AA1A /* Networking */,
+				729CE8692A41CB2B00478D89 /* ItemDTO.swift */,
 				7280216F2A3C24C800519337 /* Assets.xcassets */,
 				728021712A3C24C800519337 /* LaunchScreen.storyboard */,
 				728021742A3C24C800519337 /* Info.plist */,
@@ -160,6 +163,7 @@
 				728021672A3C24C700519337 /* AppDelegate.swift in Sources */,
 				728021692A3C24C700519337 /* SceneDelegate.swift in Sources */,
 				721F742C2A3C4AEF00012F1A /* MVVMViewController.swift in Sources */,
+				729CE86A2A41CB2B00478D89 /* ItemDTO.swift in Sources */,
 				722366D12A414EAA00D1AB76 /* NetworkingManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
