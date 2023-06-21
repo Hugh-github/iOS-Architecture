@@ -12,14 +12,60 @@ import Foundation
  */
 
 // Get, Post, Put, Delete
-class NetworkingManager {
-    static let shared = NetworkingManager()
+
+protocol URLSessionProtocol {
+    func data(for: URLRequest) async throws -> (Data, URLResponse)
+}
+
+protocol APIService {
+    var urlSession: URLSessionProtocol { get }
     
-    private init() { }
+    func execute(endPoint: EndPoint) async throws -> Data
+}
+
+extension URLSession: URLSessionProtocol { }
+
+class MockURLSession: URLSessionProtocol {
+    var statusCode: Int
+    let endPoint: EndPoint
+    let count: Int
     
-    private var urlSession: URLSession {
-        return URLSession.shared
+    init(
+        statusCode: Int,
+        endPoint: EndPoint,
+        count: Int
+    ) {
+        self.statusCode = statusCode
+        self.endPoint = endPoint
+        self.count = count
     }
+    
+    func data(for: URLRequest) async throws -> (Data, URLResponse) {
+        let httpURLResponse = HTTPURLResponse(
+            url: (endPoint.getRequest()?.url)!,
+            statusCode: statusCode,
+            httpVersion: nil,
+            headerFields: nil
+        )! as URLResponse
+        
+        return (Data(count: count), httpURLResponse)
+    }
+}
+
+class NetworkingManager: APIService {
+    static let shared = NetworkingManager(urlSession: URLSession.shared)
+    
+    let urlSession: URLSessionProtocol
+    
+    init(
+        urlSession: URLSessionProtocol
+    ) {
+        self.urlSession = urlSession
+    }
+    
+//    var urlSession: URLSessionProtocol {
+//        return URLSession.shared
+//    }
     
     func execute(endPoint: EndPoint) async throws -> Data {
         guard let request = endPoint.getRequest() else { throw NetworkingError.badRequest }
