@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MovieSearchView: UIView {
+class ItemSearchView: UIView {
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "영화 이름을 검색하세요."
@@ -17,7 +17,7 @@ class MovieSearchView: UIView {
         return searchBar
     }()
     
-    private let movieListView: UITableView = {
+    private let itemListView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .red
         tableView.translatesAutoresizingMaskIntoConstraints = false

@@ -9,7 +9,7 @@ import UIKit
 
 class MVVMViewController: UIViewController {
     
-    private let listView = MovieSearchView()
+    private let listView = ItemSearchView()
     
     override func loadView() {
         self.view = listView
