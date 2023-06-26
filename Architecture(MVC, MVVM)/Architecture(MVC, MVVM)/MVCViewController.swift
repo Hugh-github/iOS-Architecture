@@ -18,7 +18,17 @@ class MVCViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = "MVC"
         view.backgroundColor = .systemBackground
+        setNavigation()
+    }
+}
+
+private extension MVCViewController {
+    func setNavigation() {
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.searchBar.placeholder = "이름을 검색하세요."
+        
+        navigationItem.title = "MVC"
+        navigationItem.searchController = searchController
     }
 }
