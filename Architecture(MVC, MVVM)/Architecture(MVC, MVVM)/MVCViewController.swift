@@ -22,7 +22,12 @@ final class MVCViewController: UIViewController {
     private let listView = ItemSearchView()
     
     // MARK: Model
-    private var itemList = [Item]()
+    private var itemList: [Item] = [] {
+        didSet {
+            configureSnapshot()
+        }
+    }
+    
     private let networkingManager = NetworkingManager.shared
     
     private lazy var dataSource = DataSource(
@@ -48,6 +53,7 @@ final class MVCViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .systemBackground
+        self.listView.itemListView.delegate = self
         setNavigation()
     }
 }
@@ -71,6 +77,21 @@ private extension MVCViewController {
     }
 }
 
+extension MVCViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .normal, title: "Delete") { [weak self] (action, view, completionHandler) in
+            guard let self = self else { return }
+            
+            self.itemList.remove(at: indexPath.row)
+            completionHandler(true)
+        }
+        
+        deleteAction.backgroundColor = .red
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+}
+
 extension MVCViewController: UISearchBarDelegate {
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         guard let text = searchBar.text?.lowercased() else { return }
@@ -87,11 +108,13 @@ extension MVCViewController: UISearchBarDelegate {
                 let data = try await networkingManager.execute(endPoint: endPoint)
                 let itemList: ItemListDTO = try jsonManager.decodeData(data)
                 self.itemList = itemList.toDomain()
-                
-                configureSnapshot()
             } catch {
                 
             }
         }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.itemList.removeAll(keepingCapacity: true)
     }
 }
