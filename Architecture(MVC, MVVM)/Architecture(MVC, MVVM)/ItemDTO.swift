@@ -9,6 +9,12 @@ import Foundation
 
 struct ItemListDTO: Decodable {
     let items: [ItemDTO]
+    
+    func toDomain() -> [Item] {
+        return self.items.map { item in
+            Item(title: item.title, lprice: item.lprice)
+        }
+    }
 }
 
 struct ItemDTO: Decodable {
@@ -16,6 +22,11 @@ struct ItemDTO: Decodable {
     let image: String
     let lprice: String // 최저가 정보, 정보가 없으면 ""
     let hprice: String // 최고가 정보, 정보가 없으면 ""
+}
+
+struct Item: Hashable {
+    let title: String
+    let lprice: String
 }
 
 class JSONManager {

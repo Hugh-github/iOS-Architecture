@@ -10,7 +10,8 @@ import UIKit
 class ItemSearchView: UIView {
     let itemListView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = .red
+        tableView.backgroundColor = .secondarySystemBackground
+        tableView.register(ItemCell.self, forCellReuseIdentifier: "ItemCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         return tableView
