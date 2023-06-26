@@ -8,7 +8,7 @@
 import UIKit
 
 class ItemSearchView: UIView {
-    private let searchBar: UISearchBar = {
+    let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "영화 이름을 검색하세요."
         searchBar.searchBarStyle = .prominent
@@ -17,7 +17,7 @@ class ItemSearchView: UIView {
         return searchBar
     }()
     
-    private let itemListView: UITableView = {
+    let itemListView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .red
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -36,28 +36,22 @@ class ItemSearchView: UIView {
     }
 }
 
-extension MovieSearchView {
-    func setSearchBarDelegate(representative: UISearchBarDelegate) {
-        self.searchBar.delegate = representative
-    }
-}
-
-private extension MovieSearchView {
+private extension ItemSearchView {
     func setLayout() {
         addSubview(searchBar)
-        addSubview(movieListView)
+        addSubview(itemListView)
         
         NSLayoutConstraint.activate([
-            searchBar.centerXAnchor.constraint(equalTo: centerXAnchor),
-            searchBar.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            searchBar.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.9)
+            self.searchBar.centerXAnchor.constraint(equalTo: centerXAnchor),
+            self.searchBar.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            self.searchBar.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.9)
         ])
         
         NSLayoutConstraint.activate([
-            movieListView.topAnchor.constraint(equalTo: self.searchBar.bottomAnchor, constant: 5),
-            movieListView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            movieListView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            movieListView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
+            self.itemListView.topAnchor.constraint(equalTo: self.searchBar.bottomAnchor, constant: 5),
+            self.itemListView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            self.itemListView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            self.itemListView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 }
