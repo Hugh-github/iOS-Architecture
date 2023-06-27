@@ -32,7 +32,7 @@ IEEE에서는 소프트웨어 아키텍처에 대해 "소프트웨어를 구성�
 ---
 
 ## MVC(Model-View-Controller)
-![](https://hackmd.io/_uploads/By2li_ddh.png)
+<img width="776" alt="스크린샷 2023-06-27 오후 9 39 51" src="https://github.com/Hugh-github/iOS-Architecture/assets/102569735/37476a1e-a866-437d-ab57-8a3c7b642e28">
 
 MVC의 전체적인 흐름을 보자면 View에서 발생한 이벤트를 Controller에 전달합니다. Controller는 이벤트를 통해 Model을 업데이트하고 변경된 데이터를 가지고 View를 업데이트합니다.
 
