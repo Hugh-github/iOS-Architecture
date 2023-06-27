@@ -15,11 +15,8 @@ final class MVCViewController: UIViewController {
         case list
     }
     
-    // MARK: Parse
-    private let jsonManager = JSONManager.shared
-    
     // MARK: View
-    private let listView = ItemSearchView()
+    private let listView = ItemListView()
     
     // MARK: Model
     private var itemList: [Item] = [] {
@@ -28,6 +25,7 @@ final class MVCViewController: UIViewController {
         }
     }
     
+    private let jsonManager = JSONManager.shared
     private let networkingManager = NetworkingManager.shared
     
     private lazy var dataSource = DataSource(

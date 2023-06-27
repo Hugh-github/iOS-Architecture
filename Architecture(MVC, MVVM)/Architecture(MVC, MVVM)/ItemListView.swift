@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ItemSearchView: UIView {
+class ItemListView: UIView {
     let itemListView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = .secondarySystemBackground
@@ -28,7 +28,7 @@ class ItemSearchView: UIView {
     }
 }
 
-private extension ItemSearchView {
+private extension ItemListView {
     func setLayout() {
         addSubview(itemListView)
         

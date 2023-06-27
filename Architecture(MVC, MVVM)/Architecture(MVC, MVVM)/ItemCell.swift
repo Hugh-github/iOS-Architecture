@@ -55,7 +55,6 @@ extension ItemCell {
 }
 
 // MARK: Adjust Layout
-
 private extension ItemCell {
     func adjustCell() {
         addView()
