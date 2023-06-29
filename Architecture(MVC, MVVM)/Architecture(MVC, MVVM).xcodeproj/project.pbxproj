@@ -92,12 +92,9 @@
 			children = (
 				728021662A3C24C700519337 /* AppDelegate.swift */,
 				728021682A3C24C700519337 /* SceneDelegate.swift */,
-				7280216A2A3C24C700519337 /* MVCViewController.swift */,
-				721F742B2A3C4AEF00012F1A /* MVVMViewController.swift */,
-				7288EC7D2A3D91EA00889332 /* ItemListView.swift */,
-				72C5D0C72A458B4E00F5C92B /* ItemCell.swift */,
-				72BCA1DA2A401E5B0013AA1A /* Networking */,
-				729CE8692A41CB2B00478D89 /* ItemDTO.swift */,
+				72B8F7CC2A4D5C6C00F74D2E /* MVC */,
+				72B8F7CD2A4D5C8300F74D2E /* MVVM */,
+				72B8F7CE2A4D5C9000F74D2E /* Common */,
 				7280216F2A3C24C800519337 /* Assets.xcassets */,
 				728021712A3C24C800519337 /* LaunchScreen.storyboard */,
 				728021742A3C24C800519337 /* Info.plist */,
@@ -111,6 +108,49 @@
 				729284242A42D56400AADE3A /* MockNetworkingTests.swift */,
 			);
 			path = MockNetworkingTests;
+			sourceTree = "<group>";
+		};
+		72B8F7CC2A4D5C6C00F74D2E /* MVC */ = {
+			isa = PBXGroup;
+			children = (
+				7280216A2A3C24C700519337 /* MVCViewController.swift */,
+			);
+			path = MVC;
+			sourceTree = "<group>";
+		};
+		72B8F7CD2A4D5C8300F74D2E /* MVVM */ = {
+			isa = PBXGroup;
+			children = (
+				721F742B2A3C4AEF00012F1A /* MVVMViewController.swift */,
+			);
+			path = MVVM;
+			sourceTree = "<group>";
+		};
+		72B8F7CE2A4D5C9000F74D2E /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				72B8F7D02A4D5CB600F74D2E /* View */,
+				72B8F7CF2A4D5CA100F74D2E /* Model */,
+				72BCA1DA2A401E5B0013AA1A /* Networking */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		72B8F7CF2A4D5CA100F74D2E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				729CE8692A41CB2B00478D89 /* ItemDTO.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		72B8F7D02A4D5CB600F74D2E /* View */ = {
+			isa = PBXGroup;
+			children = (
+				7288EC7D2A3D91EA00889332 /* ItemListView.swift */,
+				72C5D0C72A458B4E00F5C92B /* ItemCell.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		72BCA1DA2A401E5B0013AA1A /* Networking */ = {
