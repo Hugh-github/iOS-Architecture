@@ -18,6 +18,7 @@
 		729284252A42D56400AADE3A /* MockNetworkingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729284242A42D56400AADE3A /* MockNetworkingTests.swift */; };
 		7292842C2A42DE7500AADE3A /* NetworkingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722366D02A414EAA00D1AB76 /* NetworkingManager.swift */; };
 		7292842E2A42DF7000AADE3A /* EndPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BCA1DB2A401E6C0013AA1A /* EndPoint.swift */; };
+		729894492A4E889E0041FDD3 /* ItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729894482A4E889E0041FDD3 /* ItemViewModel.swift */; };
 		729CE86A2A41CB2B00478D89 /* ItemDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CE8692A41CB2B00478D89 /* ItemDTO.swift */; };
 		72BCA1DC2A401E6C0013AA1A /* EndPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BCA1DB2A401E6C0013AA1A /* EndPoint.swift */; };
 		72C5D0C82A458B4E00F5C92B /* ItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C5D0C72A458B4E00F5C92B /* ItemCell.swift */; };
@@ -46,6 +47,7 @@
 		7288EC7D2A3D91EA00889332 /* ItemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListView.swift; sourceTree = "<group>"; };
 		729284222A42D56400AADE3A /* MockNetworkingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MockNetworkingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		729284242A42D56400AADE3A /* MockNetworkingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNetworkingTests.swift; sourceTree = "<group>"; };
+		729894482A4E889E0041FDD3 /* ItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewModel.swift; sourceTree = "<group>"; };
 		729CE8692A41CB2B00478D89 /* ItemDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDTO.swift; sourceTree = "<group>"; };
 		72BCA1DB2A401E6C0013AA1A /* EndPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndPoint.swift; sourceTree = "<group>"; };
 		72C5D0C72A458B4E00F5C92B /* ItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCell.swift; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				721F742B2A3C4AEF00012F1A /* MVVMViewController.swift */,
+				729894482A4E889E0041FDD3 /* ItemViewModel.swift */,
 			);
 			path = MVVM;
 			sourceTree = "<group>";
@@ -265,6 +268,7 @@
 				72BCA1DC2A401E6C0013AA1A /* EndPoint.swift in Sources */,
 				7288EC7E2A3D91EA00889332 /* ItemListView.swift in Sources */,
 				72C5D0C82A458B4E00F5C92B /* ItemCell.swift in Sources */,
+				729894492A4E889E0041FDD3 /* ItemViewModel.swift in Sources */,
 				7280216B2A3C24C700519337 /* MVCViewController.swift in Sources */,
 				728021672A3C24C700519337 /* AppDelegate.swift in Sources */,
 				728021692A3C24C700519337 /* SceneDelegate.swift in Sources */,
