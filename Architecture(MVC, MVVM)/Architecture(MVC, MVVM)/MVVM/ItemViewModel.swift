@@ -23,7 +23,9 @@ final class ItemViewModel {
     // Model
     private var itemList: [Item] = [] {
         didSet {
-            self.dataBinding(self.itemList)
+            DispatchQueue.main.async {
+                self.dataBinding(self.itemList)
+            }
         }
     }
     
