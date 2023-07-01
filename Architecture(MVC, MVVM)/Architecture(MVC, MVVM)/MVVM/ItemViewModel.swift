@@ -16,8 +16,8 @@ final class ItemViewModel {
     }
     
     // Network Code Or Parsing Code
-    let networkManager = NetworkingManager.shared
-    let jsonManager = JSONManager.shared
+    private let networkManager = NetworkingManager.shared
+    private let jsonManager = JSONManager.shared
     
     
     // Model
@@ -27,15 +27,18 @@ final class ItemViewModel {
         }
     }
     
-    var dataBinding: (([Item]) -> ()) = { _ in }
+    var dataBinding: (([Item]) -> ()) = { _ in } // View를 업데이트 하는 데이터 바인딩
+    var errorHandling: ((String) -> ()) = { _ in } // 에러 처리
     
+    // 좋은 방법인지는 잘 모르겠다.
     func execute(action: Action) {
         switch action {
         case .searchItem(let name):
             do {
                 try fetchData(name)
-            } catch {
-                // 에러에 따른 현재 상태를 표현
+            } catch (let error) {
+                guard let error = error as? NetworkingError else { return }
+                errorHandling(error.description)
             }
         case .deleteItem(let index):
             delete(index)

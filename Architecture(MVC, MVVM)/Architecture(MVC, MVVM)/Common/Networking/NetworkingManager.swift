@@ -104,4 +104,19 @@ enum NetworkingError: Error {
     case clientError
     case serverError
     case systemError
+    
+    var description: String {
+        switch self {
+        case .badRequest:
+            return "잘못된 요청"
+        case .unknownError:
+            return "알 수 없는 에러"
+        case .clientError:
+            return "클라이언트 에러"
+        case .serverError:
+            return "서버 에러"
+        case .systemError:
+            return "시스템 에러"
+        }
+    }
 }
