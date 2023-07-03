@@ -353,3 +353,294 @@ MVC 패턴이 위에서 언급한 좋은 아키텍처의 조건을 만족하는�
 다음으로는 MVVM 패턴에 대해 알아보겠습니다.
 
 ---
+## MVVM(Model - View - ViewModel)
+MVC 패턴의 단점 중 하나는 Controller가 너무 많은 역할을 하기 때문에 비대해지고 View와 연결되어 있기 때문에 테스트를 진행하기 어려웠습니다.
+
+![](https://hackmd.io/_uploads/SyrelFCO3.png)
+
+MVVM과 MVC 패턴의 차이점을 정리해보겠습니다.
+1. **Binding**
+    - 데이터 바인딩을 통해 View를 업데이트 합니다.
+2. **Controller의 역할**
+    - MVVM에서 Controller는 View로 생각합니다.
+
+즉, View는 화면을 초기화하고 레이아웃을 다시 설정하는 역할을 합니다. 화면에 필요한 로직은 ViewModel을 통해 처리됩니다. 하지만 이 부분에 대해서는 개인이 생각하는 로직의 수준에 따라 달라진다고 생각합니다. 예를 들어 ViewModel에서 가지고 있는 Int 타입 데이터를 Label의 text로 설정하기 위해서는 String 타입으로 변환해야 합니다. 변환 작업을 ViewModel에서 진행해도 되지만 그 정도의 간단한 작업 정도는 View에서 진행해도 괜찮다고 생각하는 경우도 있습니다. 물론 각각의 장단점은 존재합니다. ViewModel에서 로직을 처리한다면 View는 오로지 화면을 그리는데 집중할 수 있습니다. 반면 View에서 해당 로직을 진행한다면 ViewModel은 자신이 가지고 있는 데이터에만 집중할 수 있습니다. 
+
+### Binding
+ViewModel은 Binding을 통해 View를 업데이트 합니다. 하지만 ViewModel 코드를 보면 View를 직접 참조하고 있지 않습니다.
+
+Binding을 통해 View를 업데이트합니다. Binding을 구현하는 방법에 대해서 알아보겠습니다. 우선 관찰 가능한 데이터를 만들어야 합니다.
+
+> 해당 글에서는 RxSwfit와 같은 라이브러리를 사용하지 않기 때문에 직접 구현해보겠습니다.
+
+```swift
+class Observable<T> {
+    
+    struct Observer<T> {
+        weak var observer: AnyObject?
+        let listener: (T) -> Void
+    }
+    
+    var value: T {
+        didSet {
+            notifyObservers()
+        }
+    }
+    
+    private var observers = [Observer<T>]()
+    
+    init(_ value: T) {
+        self.value = value
+    }
+    
+    func addObserver(on observer: AnyObject, _ closure: @escaping (T) -> Void) {
+        observers.append(Observer(observer: observer, listener: closure))
+    }
+    
+    func removeObserver(observer: AnyObject) {
+        observers = observers.filter { $0.observer !== observer }
+    }
+    
+    private func notifyObservers() {
+        for observer in observers {
+            observer.listener(value)
+        }
+    }
+}
+```
+
+위 코드처럼 Binding은 **Observer** 패턴으로 구현이 가능합니다. 해당 데이터를 관찰하는 객체를 저장하고 해당 객체에서 동작해야 하는 업데이트 코드를 동작시킵니다. 여기서 주의할 점은 **Observer** 패턴은 관찰자를 등록하는 코드(`addObserver`)와 제거하는 코드(`removeObserver`)가 반드시 필요합니다. 또한 어느 시점에 해당 함수들을 호출할지 고민할 필요가 있습니다.
+
+> Observer 객체를 등록하고 해지하지 않는다면 memory leak이 발생할 수 있습니다.
+
+그렇다면 이제 ViewModel 코드를 확인해 보겠습니다. 먼저 enum을 사용해 View에서 ViewModel에 보낼 수 있는 Action을 정의했습니다.
+```swift
+enum Action {
+    case searchItem(String)
+    case deleteItem(Int)
+    case cancelSearch
+}
+```
+이 부분 같은 경우는 반드시 필수가 아니라고 생각합니다. 개인적인 생각으로는 View에서 발생할 수 있는 Action을 정의하고 사용하면 View에서 각각의 이벤트가 발생할 때 필요한 함수를 직접 호출하는 게 아닌 하나의 함수에 명확한 파라미터를 제공함으로써 로직을 실행할 수 있다고 판단했습니다.
+
+```swift
+class ItemViewModel {
+    // Event
+    enum Action {
+        case searchItem(String)
+        case deleteItem(Int)
+        case cancelSearch
+    }
+    
+    // Network Code Or Parsing Code
+    private let networkManager = NetworkingManager.shared
+    private let jsonManager = JSONManager.shared
+    
+    
+    // Model
+    private var itemList = Observable<[Item]>([])
+    
+    var errorHandling: ((String) -> ()) = { _ in } // 에러 처리
+    
+    func execute(action: Action) {
+        switch action {
+        case .searchItem(let name):
+            fetchData(name)
+        case .deleteItem(let index):
+            delete(index)
+        case .cancelSearch:
+            remove()
+        }
+    }
+    
+    func subscribe(on object: AnyObject, handling: @escaping ([Item]) -> Void) {
+        self.itemList.addObserver(on: object, handling)
+    }
+    
+    func unsubscribe(on object: AnyObject) {
+        self.itemList.removeObserver(observer: object)
+    }
+}
+
+private extension ItemViewModel {
+    func fetchData(_ name: String) {
+        let endPoint = EndPoint(
+            base: .naverSearch,
+            query: .init(itemName: name),
+            method: .get,
+            header: .init()
+        )
+        
+        Task {
+            do {
+                let data = try await networkManager.execute(endPoint: endPoint)
+                let itemList: ItemListDTO = try jsonManager.decodeData(data)
+                self.itemList.value = itemList.toDomain()
+            } catch let error {
+                guard let error = error as? NetworkingError else { return }
+                errorHandling(error.description)
+            }
+        }
+    }
+    
+    func delete(_ index: Int) {
+        self.itemList.value.remove(at: index)
+    }
+    
+    func remove() {
+        self.itemList.value.removeAll()
+    }
+}
+```
+
+실제로 제가 작성한 ViewModel 코드를 보면 실제 로직을 처리하는 함수 `fetchData`, `delete`, `remove`는 View에서 접근이 불가능합니다.
+
+View에서는 `execute` 함수를 호출해 사용자의 Action을 ViewModel에 전달하면 ViewModel에 입력에 따른 비즈니스 로직을 처리하고 데이터(`itemList`)를 업데이트합니다. `itemList` 가 업데이트되면 아까 위에서 확인한 **Observable**의 `notifyObservers` 함수가 호출되며 View가 업데이트됩니다.
+
+MVC 패턴에서 Controller에 있던 Network, Parsing 코드와 Model이 ViewModel에 존재하는 걸 확인할 수 있습니다.
+
+마지막으로 Controller 코드를 확인해 보겠습니다.
+```swift
+class MVVMViewController: UIViewController {
+    typealias DataSource = UITableViewDiffableDataSource<Section, Item>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Item>
+    
+    enum Section: CaseIterable {
+        case list
+    }
+    
+    // MARK: ViewModel
+    private let viewModel = ItemViewModel()
+    
+    // MARK: View
+    private let listView = ItemListView()
+    
+    private lazy var dataSource = DataSource(
+        tableView: self.listView.itemListView
+    ) { tableView, indexPath, itemIdentifier in
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell", for: indexPath) as? ItemCell else {
+            return UITableViewCell()
+        }
+        
+        let name = itemIdentifier.title
+        let price = itemIdentifier.lprice
+        
+        cell.setContent(text: name, price)
+        
+        return cell
+    }
+    
+    override func loadView() {
+        self.view = listView
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.backgroundColor = .systemBackground
+        self.listView.itemListView.delegate = self
+        
+        self.setNavigation()
+        self.setDataBinding()
+        self.setErrorHandling()
+    }
+}
+
+// MARK: Set ViewModel Closure
+private extension MVVMViewController {
+    func setNavigation() {
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.searchBar.placeholder = "이름을 검색하세요."
+        searchController.searchBar.delegate = self
+        
+        navigationItem.title = "MVVM"
+        navigationItem.searchController = searchController
+    }
+    
+    func setDataBinding() {
+        self.viewModel.subscribe(on: self) { [weak self] itemList in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.configureSnapshot(itemList)
+            }
+        }
+    }
+    
+    func setErrorHandling() {
+        self.viewModel.errorHandling = { [weak self] message in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.configureAlert(message)
+            }
+        }
+    }
+    
+    func configureSnapshot(_ items: [Item]) {
+        var snapshot = Snapshot()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(items, toSection: .list)
+        
+        self.dataSource.apply(snapshot)
+    }
+    
+    func configureAlert(_ message: String) {
+        let alertController = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        
+        let alertAction = UIAlertAction(
+            title: "OK",
+            style: .destructive
+        )
+        
+        alertController.addAction(alertAction)
+        self.present(alertController, animated: false)
+    }
+}
+
+extension MVVMViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .normal, title: "Delete") { [weak self] (action, view, completionHandler) in
+            guard let self = self else { return }
+            
+            self.viewModel.execute(action: .deleteItem(indexPath.row))
+            completionHandler(true)
+        }
+        
+        deleteAction.backgroundColor = .red
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+}
+
+extension MVVMViewController: UISearchBarDelegate {
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        guard let text = searchBar.text?.lowercased() else { return }
+        
+        self.viewModel.execute(action: .searchItem(text))
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.viewModel.execute(action: .cancelSearch)
+    }
+}
+```
+
+MVC 패턴과의 차이점은 Controller가 ViewModel과 View만 가지고 있게 된 것입니다. 또한 각각의 이벤트에 대한 비즈니스 로직을 직접 처리하는 것이 아닌 ViewModel의 함수를 호출해 처리하고 있습니다.
+
+그럼 MVVM 패턴이 좋은 아키텍처의 조건을 만족하는지 확인해 보겠습니다.
+1. **역할 분배** : MVC 패턴에서 Controller가 많은 역할을 하는 문제점은 해결할 수 있었습니다. 하지만 여전히 ViewModel에서 많은 역할을 수행하고 있다고 생각할 수 있습니다.
+2. **테스트** : ViewModel은 View를 직접적으로 가지고 있지 않기 때문에 테스트 가능합니다. 하지만 적절한 테스트를 진행하기 위해서는 테스트하기 위한 로직에 대해 추상화가 필요합니다.
+3. **비용** : 위 예시는 간단하기 때문에 복잡하지 않다고 생각할 수 있습니다. 하지만 ViewModel과 View는 1:N 관계를 가질 수 있기 때문에 여러 View에서 하나의 ViewModel에 의존하고 있다면 각각 로직에 대해 분리해서 관리하는 것이 효율적일 것입니다. 그렇다면 좀 더 다양한 객체를 관리하고 구현해야 하기 때문에 개발 단계에서는 많은 비용이 필요할 것이라고 생각합니다. 하지만 유지 보수 과정에서는 그만큼 큰 이점이 존재할 것이라고 생각합니다.
+
+> **주의 : 개인적인 의견이 포함되어 있습니다.**
+
+MVVM 패턴을 사용한다면 테스트 부분에서 큰 이점을 가질 수 있습니다. 저도 이 부분이 MVVM 패턴에 가장 큰 장점이라고 생각합니다.
+
+어떻게 테스트 코드를 작성해야 하고 어떤 테스트를 진행해야 하는지에 대해서 알아보겠습니다.
+
+---
