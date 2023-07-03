@@ -21,37 +21,32 @@ final class ItemViewModel {
     
     
     // Model
-    private var itemList: [Item] = [] {
-        didSet {
-            DispatchQueue.main.async {
-                self.dataBinding(self.itemList)
-            }
-        }
-    }
+    private var itemList = Observable<[Item]>([])
     
-    var dataBinding: (([Item]) -> ()) = { _ in } // View를 업데이트 하는 데이터 바인딩
     var errorHandling: ((String) -> ()) = { _ in } // 에러 처리
     
-    // 좋은 방법인지는 잘 모르겠다.
     func execute(action: Action) {
         switch action {
         case .searchItem(let name):
-            do {
-                try fetchData(name)
-            } catch (let error) {
-                guard let error = error as? NetworkingError else { return }
-                errorHandling(error.description)
-            }
+            fetchData(name)
         case .deleteItem(let index):
             delete(index)
         case .cancelSearch:
             remove()
         }
     }
+    
+    func subscribe(on object: AnyObject, handling: @escaping ([Item]) -> Void) {
+        self.itemList.addObserver(on: object, handling)
+    }
+    
+    func unsubscribe(on object: AnyObject) {
+        self.itemList.removeObserver(observer: object)
+    }
 }
 
 private extension ItemViewModel {
-    func fetchData(_ name: String) throws {
+    func fetchData(_ name: String) {
         let endPoint = EndPoint(
             base: .naverSearch,
             query: .init(itemName: name),
@@ -60,18 +55,23 @@ private extension ItemViewModel {
         )
         
         Task {
-            let data = try await networkManager.execute(endPoint: endPoint)
-            let itemList: ItemListDTO = try jsonManager.decodeData(data)
-            self.itemList = itemList.toDomain()
+            do {
+                let data = try await networkManager.execute(endPoint: endPoint)
+                let itemList: ItemListDTO = try jsonManager.decodeData(data)
+                self.itemList.value = itemList.toDomain()
+            } catch let error {
+                guard let error = error as? NetworkingError else { return }
+                errorHandling(error.description)
+            }
         }
     }
     
     func delete(_ index: Int) {
-        self.itemList.remove(at: index)
+        self.itemList.value.remove(at: index)
     }
     
     func remove() {
-        self.itemList.removeAll()
+        self.itemList.value.removeAll()
     }
 }
 

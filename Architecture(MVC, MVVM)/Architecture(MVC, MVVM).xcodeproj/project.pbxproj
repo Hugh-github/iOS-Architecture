@@ -22,6 +22,7 @@
 		729CE86A2A41CB2B00478D89 /* ItemDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CE8692A41CB2B00478D89 /* ItemDTO.swift */; };
 		72BCA1DC2A401E6C0013AA1A /* EndPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BCA1DB2A401E6C0013AA1A /* EndPoint.swift */; };
 		72C5D0C82A458B4E00F5C92B /* ItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C5D0C72A458B4E00F5C92B /* ItemCell.swift */; };
+		72FB4A302A527A0D00D82B7F /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72FB4A2F2A527A0D00D82B7F /* Observable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		729CE8692A41CB2B00478D89 /* ItemDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemDTO.swift; sourceTree = "<group>"; };
 		72BCA1DB2A401E6C0013AA1A /* EndPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndPoint.swift; sourceTree = "<group>"; };
 		72C5D0C72A458B4E00F5C92B /* ItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCell.swift; sourceTree = "<group>"; };
+		72FB4A2F2A527A0D00D82B7F /* Observable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Observable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +127,7 @@
 			children = (
 				721F742B2A3C4AEF00012F1A /* MVVMViewController.swift */,
 				729894482A4E889E0041FDD3 /* ItemViewModel.swift */,
+				72FB4A2F2A527A0D00D82B7F /* Observable.swift */,
 			);
 			path = MVVM;
 			sourceTree = "<group>";
@@ -265,6 +268,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72FB4A302A527A0D00D82B7F /* Observable.swift in Sources */,
 				72BCA1DC2A401E6C0013AA1A /* EndPoint.swift in Sources */,
 				7288EC7E2A3D91EA00889332 /* ItemListView.swift in Sources */,
 				72C5D0C82A458B4E00F5C92B /* ItemCell.swift in Sources */,

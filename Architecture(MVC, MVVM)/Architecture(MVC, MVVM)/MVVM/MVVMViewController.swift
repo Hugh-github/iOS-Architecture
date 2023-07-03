@@ -64,10 +64,12 @@ private extension MVVMViewController {
     }
     
     func setDataBinding() {
-        self.viewModel.dataBinding = { [weak self] itemList in
+        self.viewModel.subscribe(on: self) { [weak self] itemList in
             guard let self = self else { return }
             
-            self.configureSnapshot(itemList)
+            DispatchQueue.main.async {
+                self.configureSnapshot(itemList)
+            }
         }
     }
     
@@ -75,7 +77,9 @@ private extension MVVMViewController {
         self.viewModel.errorHandling = { [weak self] message in
             guard let self = self else { return }
             
-            self.configureAlert(message)
+            DispatchQueue.main.async {
+                self.configureAlert(message)
+            }
         }
     }
     

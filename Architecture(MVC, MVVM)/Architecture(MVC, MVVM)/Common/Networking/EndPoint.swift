@@ -103,5 +103,7 @@ enum HTTPMethod: String {
 
 struct EssentailHeader {
     let clientID = "1RYp_vWiUKUPApHEhCCI"
-    let clientSecret = "ugjer6esDS"
+//    let clientSecret = "ugjer6esDS"
+    
+    let clientSecret = "ugjer6esDQ"
 }
