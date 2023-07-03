@@ -73,6 +73,22 @@ private extension MVCViewController {
         
         self.dataSource.apply(snapshot)
     }
+    
+    func configureAlert(_ message: String) {
+        let alertController = UIAlertController(
+            title: "Error",
+            message: message,
+            preferredStyle: .alert
+        )
+        
+        let alertAction = UIAlertAction(
+            title: "OK",
+            style: .destructive
+        )
+        
+        alertController.addAction(alertAction)
+        self.present(alertController, animated: false)
+    }
 }
 
 extension MVCViewController: UITableViewDelegate {
@@ -106,8 +122,10 @@ extension MVCViewController: UISearchBarDelegate {
                 let data = try await networkingManager.execute(endPoint: endPoint)
                 let itemList: ItemListDTO = try jsonManager.decodeData(data)
                 self.itemList = itemList.toDomain()
-            } catch {
+            } catch (let error){
+                guard let error = error as? NetworkingError else { return }
                 
+                configureAlert(error.description)
             }
         }
     }
