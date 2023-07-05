@@ -1,0 +1,34 @@
+{
+    "items" : [
+        {
+            "title" : "아이폰 11",
+            "image" : "",
+            "lprice" : "1500",
+            "hprice" : ""
+        },
+        {
+            "title" : "아이폰 12",
+            "image" : "",
+            "lprice" : "1600",
+            "hprice" : ""
+        },
+        {
+            "title" : "아이폰 13",
+            "image" : "",
+            "lprice" : "1700",
+            "hprice" : ""
+        },
+        {
+            "title" : "아이폰 14",
+            "image" : "",
+            "lprice" : "1800",
+            "hprice" : ""
+        },
+        {
+            "title" : "아이폰 15",
+            "image" : "",
+            "lprice" : "1900",
+            "hprice" : ""
+        }
+    ]
+}
