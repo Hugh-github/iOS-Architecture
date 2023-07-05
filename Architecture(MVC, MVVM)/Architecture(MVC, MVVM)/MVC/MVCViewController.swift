@@ -25,8 +25,8 @@ final class MVCViewController: UIViewController {
         }
     }
     
-    private let jsonManager = JSONManager.shared
-    private let networkingManager = NetworkingManager.shared
+    // MARK: Network & Parsing Code
+    private let apiService = ItemAPIService()
     
     private lazy var dataSource = DataSource(
         tableView: self.listView.itemListView
@@ -110,18 +110,10 @@ extension MVCViewController: UISearchBarDelegate {
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         guard let text = searchBar.text?.lowercased() else { return }
         
-        let endPoint = EndPoint(
-            base: .naverSearch,
-            query: .init(itemName: text),
-            method: .get,
-            header: .init()
-        )
-        
         Task {
             do {
-                let data = try await networkingManager.execute(endPoint: endPoint)
-                let itemList: ItemListDTO = try jsonManager.decodeData(data)
-                self.itemList = itemList.toDomain()
+                guard let list = try await apiService.getItemList(query: .init(itemName: text)) else { return }
+                self.itemList = list
             } catch (let error){
                 guard let error = error as? NetworkingError else { return }
                 

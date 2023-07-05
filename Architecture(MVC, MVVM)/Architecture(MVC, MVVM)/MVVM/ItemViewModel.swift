@@ -16,8 +16,7 @@ final class ItemViewModel {
     }
     
     // Network Code Or Parsing Code
-    private let networkManager = NetworkingManager.shared
-    private let jsonManager = JSONManager.shared
+    private let apiService = ItemAPIService()
     
     
     // Model
@@ -47,18 +46,10 @@ final class ItemViewModel {
 
 private extension ItemViewModel {
     func fetchData(_ name: String) {
-        let endPoint = EndPoint(
-            base: .naverSearch,
-            query: .init(itemName: name),
-            method: .get,
-            header: .init()
-        )
-        
         Task {
             do {
-                let data = try await networkManager.execute(endPoint: endPoint)
-                let itemList: ItemListDTO = try jsonManager.decodeData(data)
-                self.itemList.value = itemList.toDomain()
+                guard let list = try await apiService.getItemList(query: .init(itemName: name)) else { return }
+                self.itemList.value = list
             } catch let error {
                 guard let error = error as? NetworkingError else { return }
                 errorHandling(error.description)

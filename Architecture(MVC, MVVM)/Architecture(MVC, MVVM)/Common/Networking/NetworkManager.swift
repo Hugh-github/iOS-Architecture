@@ -19,28 +19,6 @@ protocol URLSessionProtocol {
 
 extension URLSession: URLSessionProtocol { }
 
-class MockURLSession: URLSessionProtocol {
-    var statusCode: Int
-    
-    init(
-        statusCode: Int
-    ) {
-        self.statusCode = statusCode
-    }
-    
-    func data(for: URLRequest) async throws -> (Data, URLResponse) {
-        let httpURLResponse = HTTPURLResponse(
-            url: URL(string: "123")!,
-            statusCode: statusCode,
-            httpVersion: nil,
-            headerFields: nil
-        )! as URLResponse
-        
-        return (Data(), httpURLResponse)
-    }
-}
-
-// 테스트를 Data의 크기가 아닌 MockData가 정상적으로 가져와지는지 확인
 class NetworkManager {
     static let shared = NetworkManager(urlSession: URLSession.shared)
     
@@ -109,14 +87,20 @@ enum NetworkingError: Error {
 protocol APIService {
     var networkManager: NetworkManager { get }
     
-    func getItemList(query: RequestQuery) throws -> [Item]?
+    func getItemList(query: RequestQuery) async throws -> [Item]?
 }
 
 class ItemAPIService: APIService {
-    var networkManager = NetworkManager.shared
+    var networkManager: NetworkManager
     private let jsonManager = JSONManager.shared
     
-    func getItemList(query: RequestQuery) throws -> [Item]? {
+    init(
+        networkManager: NetworkManager = NetworkManager.shared
+    ) {
+        self.networkManager = networkManager
+    }
+    
+    func getItemList(query: RequestQuery) async throws -> [Item]? {
         let endPoint = EndPoint(
             base: .naverSearch,
             query: query,
@@ -124,13 +108,9 @@ class ItemAPIService: APIService {
             header: .init()
         )
         
-        Task {
-            let data = try await networkManager.execute(endPoint: endPoint)
-            let modelDTO: ItemListDTO = try jsonManager.decodeData(data)
+        let data = try await networkManager.execute(endPoint: endPoint)
+        let modelDTO: ItemListDTO = try jsonManager.decodeData(data)
             
-            return modelDTO.toDomain()
-        }
-        
-        return nil
+        return modelDTO.toDomain()
     }
 }
