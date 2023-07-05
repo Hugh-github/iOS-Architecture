@@ -17,43 +17,32 @@ protocol URLSessionProtocol {
     func data(for: URLRequest) async throws -> (Data, URLResponse)
 }
 
-protocol APIService {
-    var urlSession: URLSessionProtocol { get }
-    
-    func execute(endPoint: EndPoint) async throws -> Data
-}
-
 extension URLSession: URLSessionProtocol { }
 
 class MockURLSession: URLSessionProtocol {
     var statusCode: Int
-    let endPoint: EndPoint
-    let count: Int
     
     init(
-        statusCode: Int,
-        endPoint: EndPoint,
-        count: Int
+        statusCode: Int
     ) {
         self.statusCode = statusCode
-        self.endPoint = endPoint
-        self.count = count
     }
     
     func data(for: URLRequest) async throws -> (Data, URLResponse) {
         let httpURLResponse = HTTPURLResponse(
-            url: (endPoint.getRequest()?.url)!,
+            url: URL(string: "123")!,
             statusCode: statusCode,
             httpVersion: nil,
             headerFields: nil
         )! as URLResponse
         
-        return (Data(count: count), httpURLResponse)
+        return (Data(), httpURLResponse)
     }
 }
 
-class NetworkingManager: APIService {
-    static let shared = NetworkingManager(urlSession: URLSession.shared)
+// 테스트를 Data의 크기가 아닌 MockData가 정상적으로 가져와지는지 확인
+class NetworkManager {
+    static let shared = NetworkManager(urlSession: URLSession.shared)
     
     let urlSession: URLSessionProtocol
     
@@ -62,10 +51,6 @@ class NetworkingManager: APIService {
     ) {
         self.urlSession = urlSession
     }
-    
-//    var urlSession: URLSessionProtocol {
-//        return URLSession.shared
-//    }
     
     func execute(endPoint: EndPoint) async throws -> Data {
         guard let request = endPoint.getRequest() else { throw NetworkingError.badRequest }
@@ -94,8 +79,8 @@ class NetworkingManager: APIService {
         default:
             throw NetworkingError.systemError
         }
-        
     }
+    
 }
 
 enum NetworkingError: Error {
@@ -118,5 +103,34 @@ enum NetworkingError: Error {
         case .systemError:
             return "시스템 에러"
         }
+    }
+}
+
+protocol APIService {
+    var networkManager: NetworkManager { get }
+    
+    func getItemList(query: RequestQuery) throws -> [Item]?
+}
+
+class ItemAPIService: APIService {
+    var networkManager = NetworkManager.shared
+    private let jsonManager = JSONManager.shared
+    
+    func getItemList(query: RequestQuery) throws -> [Item]? {
+        let endPoint = EndPoint(
+            base: .naverSearch,
+            query: query,
+            method: .get,
+            header: .init()
+        )
+        
+        Task {
+            let data = try await networkManager.execute(endPoint: endPoint)
+            let modelDTO: ItemListDTO = try jsonManager.decodeData(data)
+            
+            return modelDTO.toDomain()
+        }
+        
+        return nil
     }
 }
