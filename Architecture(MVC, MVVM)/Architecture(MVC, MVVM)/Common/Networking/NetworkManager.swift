@@ -114,3 +114,19 @@ class ItemAPIService: APIService {
         return modelDTO.toDomain()
     }
 }
+
+// StubAPIService를 가지고 ViewModel 테스트가 가능하다. (가능한 이유: 이미 APIService에 대한 테스트를 진행했기 때문에 Stub 객체를 만들어 원하는 결과를 반환하는 Service를 만들어도 무방하다.)
+
+class StubItemAPIService: APIService {
+    var networkManager: NetworkManager = NetworkManager.shared
+    
+    func getItemList(query: RequestQuery) async throws -> [Item]? {
+        return [
+            Item(title: "아이폰 11", lprice: "1500"),
+            Item(title: "아이폰 12", lprice: "1600"),
+            Item(title: "아이폰 13", lprice: "1700"),
+            Item(title: "아이폰 14", lprice: "1800"),
+            Item(title: "아이폰 15", lprice: "1900")
+        ]
+    }
+}

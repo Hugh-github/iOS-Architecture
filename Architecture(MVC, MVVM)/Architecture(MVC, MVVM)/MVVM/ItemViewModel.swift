@@ -15,13 +15,18 @@ final class ItemViewModel {
         case cancelSearch
     }
     
-    // Network Code Or Parsing Code
-    private let apiService = ItemAPIService()
-    
-    
     // Model
     private var itemList = Observable<[Item]>([])
     
+    // Network Code Or Parsing Code
+    private let apiService: APIService
+    
+    init(
+        apiService: APIService = ItemAPIService()
+    ) {
+        self.apiService = apiService
+    }
+
     var errorHandling: ((String) -> ()) = { _ in } // 에러 처리
     
     func execute(action: Action) {
