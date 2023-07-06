@@ -8,7 +8,16 @@
 import Foundation
 
 class StubItemAPIService: APIService {
-    var networkManager: NetworkManager = NetworkManager.shared
+    private let items: [Item]
+    var networkManager: NetworkManager
+    
+    init(
+        items: [Item],
+        networkManager: NetworkManager = NetworkManager.shared
+    ) {
+        self.items = items
+        self.networkManager = networkManager
+    }
     
     func getItemList(query: RequestQuery) async throws -> [Item]? {
         return [

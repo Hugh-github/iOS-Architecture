@@ -23,7 +23,7 @@ final class StubViewModelTest: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         
-        self.stubAPIService = StubItemAPIService()
+        self.stubAPIService = StubItemAPIService(items: data)
         self.viewModel = ItemViewModel(apiService: stubAPIService)
     }
 
@@ -44,7 +44,7 @@ final class StubViewModelTest: XCTestCase {
     
     func test_Swipe를_액션을_통해_특정_index의_데이터_제거하는지_확인() {
         let expectation = XCTestExpectation(description: "ViewModelTest")
-        viewModel.execute(action: .searchItem("아이폰")) // 여기서 비동기로 데이터를 가져옴
+        viewModel.execute(action: .searchItem("아이폰"))
         expectation.fulfill()
         wait(for: [expectation], timeout: 3.0)
         
@@ -56,7 +56,7 @@ final class StubViewModelTest: XCTestCase {
     
     func test_취소버튼_눌렸을때_모든_데이터를_제거하는지_확인() {
         let expectation = XCTestExpectation(description: "ViewModelTest")
-        viewModel.execute(action: .searchItem("아이폰")) // 여기서 비동기로 데이터를 가져옴
+        viewModel.execute(action: .searchItem("아이폰"))
         expectation.fulfill()
         wait(for: [expectation], timeout: 3.0)
         
