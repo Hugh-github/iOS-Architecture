@@ -16,7 +16,7 @@ final class ItemViewModel {
     }
     
     // Model
-    private var itemList = Observable<[Item]>([])
+    private(set) var itemList = Observable<[Item]>([])
     
     // Network Code Or Parsing Code
     private let apiService: APIService
