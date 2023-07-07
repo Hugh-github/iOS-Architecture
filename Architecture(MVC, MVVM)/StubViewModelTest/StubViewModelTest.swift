@@ -38,6 +38,9 @@ final class StubViewModelTest: XCTestCase {
         let expectation = XCTestExpectation(description: "ViewModelTest")
         viewModel.execute(action: .searchItem("아이폰"))
         expectation.fulfill()
+        wait(for: [expectation], timeout: 3.0)
+        
+        print(viewModel.itemList.value)
         
         XCTAssertEqual(viewModel.itemList.value, data)
     }
