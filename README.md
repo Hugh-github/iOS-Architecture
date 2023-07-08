@@ -4,7 +4,7 @@
 
 > **주의사항 : 코드에는 정답이 없기 때문에 참고 목적으로 사용하면 좋을 것 같습니다.**
 
-간단한 예제를 각각 MVC, MVVM 패턴으로 구현해 보고 느낀 점에 대해 작성한 글입니다.
+간단한 예제를 MVC, MVVM 패턴으로 구현해 보고 느낀 점에 대해 작성한 글입니다.
 
 |검색|제거|취소|
 |---|---|---|
@@ -16,7 +16,7 @@
 
 IEEE에서는 소프트웨어 아키텍처에 대해 "소프트웨어를 구성하는 컴포넌트들, 이들 간의 상호작용 및 관계, 각 컴포넌트들의 특성 및 이들이 구성하는 소프트웨어의 설계 및 진화를 위한 각종 원칙들의 집합"이라고 정의합니다.
 
-아키텍처를 프로젝트에 적용하는 과정에서 개발자마다 생각하는 방향이 다르고 지식이 다르기 때문에 정답이 없습니다. 따라서 진행하고 있는 프로젝트 성격에 따라 적절한 방법을 선택하면 됩니다.
+아키텍처를 프로젝트에 적용하는 과정에서 개발자마다 생각하는 방향이 다르고 지식이 다르기 때문에 정답이 없습니다. 따라서 진행하고 있는 프로젝트 성격에 따라 적절한 방법을 선택하는 게 좋습니다.
 
 [iOS Architecutre Pattern](https://medium.com/ios-os-x-development/ios-architecture-patterns-ecba4c38de52) 글에서는 좋은 아키텍처의 기능을 3가지로 정의하고 있습니다.
 
@@ -28,7 +28,7 @@ IEEE에서는 소프트웨어 아키텍처에 대해 "소프트웨어를 구성�
 3. **Easy of use(쉬운 사용)**
     - 프로젝트를 개발하거나 유지 보수하는 과정에서 비용을 고려해야 합니다.
 
-저는 이 중에서 테스트와 비용이 아키텍처를 사용하는 목적이라고 생각합니다. (수정)
+저는 이 중에서 테스트와 비용이 아키텍처를 사용하는 목적이라고 생각합니다. 균형 있는 역할 분배를 하는 목적은 비용과 연관이 있다고 생각합니다. 개발 단계에서는 객체를 쪼개는 작업이 오래 걸리지만 유지 보수 측면에서는 장점이 있기 때문입니다.
 
 그럼 지금부터 MVC와 MVVM 패턴에 대해 알아보겠습니다.
 
@@ -48,36 +48,39 @@ Model의 역할에 대해서 알아보겠습니다. 일반적으로 Model이라�
 2. **Persistance code** : CoreData와 같은 데이터 베이스에 데이터를 저장합니다.
 3. **Parsing code** : 데이터를 저희가 사용할 Model로 파싱합니다.
 
-더 다양한 역할이 존재하지만 제가 중요하게 생각하는 부분은 위 3가지 역할입니다. Model이 화면에 필요한 캡슐화된 데이터를 가지고 있는 역할이라면 필요한 데이터를 가져오고 가공하는 작업도 Model과 같은 계층에 포함되도 어색할게 없다고 생각합니다.
+일반적으로 생각하는 Model은 DTO입니다. 서버에서 가져오는 데이터는 저희 앱에 바로 사용이 불가능합니다. 사용하고자 하는 값으로 Parsing을 진행해야 합니다. 그렇기 때문에 저도 서버나 로컬 데이터 베이스에서 데이터를 가져오는 코드와 데이터를 Model로 Parsing 하는 코드도 Model에 포함될 수 있다고 생각합니다.
 
+저는 이번 예제에서 Network Code와 Parsing Code를 각각 구현하고 두 가지 Code를 사용해 저희가 원하는 Model을 얻을 수 있는 객체를 구현해 보도록 하겠습니다.
+
+그럼 먼저 Network Code를 확인해 보겠습니다.
 ```swift
 // Network code
-class NetworkingManager: APIService {
-    static let shared = NetworkingManager(urlSession: URLSession.shared)
-
+class NetworkManager {
+    static let shared = NetworkManager(urlSession: URLSession.shared)
+    
     let urlSession: URLSessionProtocol
-
+    
     init(
         urlSession: URLSessionProtocol
     ) {
         self.urlSession = urlSession
     }
-
+    
     func execute(endPoint: EndPoint) async throws -> Data {
         guard let request = endPoint.getRequest() else { throw NetworkingError.badRequest }
         let (data, response) = try await urlSession.data(for: request)
         try handleResponse(response)
-
+        
         return data
     }
-
+    
     private func handleResponse(_ response: URLResponse) throws {
         guard let urlResponse = response as? HTTPURLResponse else {
             throw NetworkingError.unknownError
         }
-
+        
         let code = urlResponse.statusCode
-
+        
         switch code {
         case 100...199:
             return
@@ -90,8 +93,8 @@ class NetworkingManager: APIService {
         default:
             throw NetworkingError.systemError
         }
-
     }
+    
 }
 
 enum NetworkingError: Error {
@@ -100,8 +103,26 @@ enum NetworkingError: Error {
     case clientError
     case serverError
     case systemError
+    
+    var description: String {
+        switch self {
+        case .badRequest:
+            return "잘못된 요청"
+        case .unknownError:
+            return "알 수 없는 에러"
+        case .clientError:
+            return "클라이언트 에러"
+        case .serverError:
+            return "서버 에러"
+        case .systemError:
+            return "시스템 에러"
+        }
+    }
 }
+```
+`NetworkManager`는 서버에 요청을 보내 데이터와 응답을 반환하는 역할을 하고 있습니다. HTTPMethod에 따라 데이터를 가져올 수 도 있고 데이터를 등록할 수도 있습니다. 현재 예제에서는 GET만 사용하기 때문에 큰 문제는 없지만 만약 POST를 진행한다고 해도 `EndPoint` 객체를 이용해 필요한 요청을 생성하면 됩니다.
 
+```swift
 // Parsing code
 class JSONManager {
     static let shared = JSONManager()
@@ -148,13 +169,40 @@ struct ItemDTO: Decodable {
     let lprice: String
     let hprice: String
 }
-
 ```
+다음은 Parsing Code입니다. 서버에서 받아온 json 데이터를 사용하기 위해서는 디코딩 과정이 필요합니다. `JSONManager`는 디코딩을 통해 데이터를 앱에서 사용할 Model로 매핑을 진행합니다.
 
-위 코드를 살펴보면 **NetworkManager** 객체는 서버에 데이터를 요청하고 응답을 처리하고 있습니다. 서버에서 받아온 데이터를 저희가 사용할 Model인 **Item**으로 파싱 하는 역할은 **JSONManager**가 하고 있습니다. 결과적으로 화면을 구현하는 데 필요한 **Item** 객체를 얻을 수 있습니다.
+마지막으로 두 가지 Code를 사용해 서버에 데이터를 요청하고 파싱 한 모델을 가져오는 `Service` 객체를 확인해 보겠습니다.
 
-저의 예시에서는 데이터를 가지고 화면을 구현하는 View는 TableView의 Cell이기 때문에 Cell 코드를 보겠습니다.
+```swift 
+class ItemAPIService {
+    var networkManager: NetworkManager
+    private let jsonManager = JSONManager.shared
+    
+    init(
+        networkManager: NetworkManager = NetworkManager.shared
+    ) {
+        self.networkManager = networkManager
+    }
+    
+    func getItemList(query: RequestQuery) async throws -> [Item]? {
+        let endPoint = EndPoint(
+            base: .naverSearch,
+            query: query,
+            method: .get,
+            header: .init()
+        )
+        
+        let data = try await networkManager.execute(endPoint: endPoint)
+        let modelDTO: ItemListDTO = try jsonManager.decodeData(data)
+            
+        return modelDTO.toDomain()
+    }
+}
+```
+`ItemAPIService`는 앱에서 필요한 데이터를 불러오는 역할을 합니다. `modelDTO.toDomain()`을 보시면 항상 서버에서 오는 데이터가 전부 필요한 경우는 없습니다. 저희는 필요한 데이터를 효과적으로 캡슐화해 사용할 수 있습니다. 즉, `ItemListDTO`를 그대로 사용하는 것이 아닌 필요한 데이터만을 모아 `Item`으로 캡슐화해 사용합니다.
 
+다음은 View 관련된 코드를 확인해 보겠습니다. 예제를 보면 검색한 결과를 TableView의 Cell을 통해 보여주고 있습니다. Cell은 Controller로부터 데이터를 받아 화면을 구성하는 역할을 합니다.
 ```swift
 class ItemCell: UITableViewCell {
     private let descriptionStackView: UIStackView = {
@@ -379,7 +427,7 @@ extension MVCViewController: UISearchBarDelegate {
 
 ```
 
-View에서 발생하는 이벤트를 Controller에 전달하는 방법은 주로 **Delegate** 패턴을 사용합니다. 실제로 Swift에서는 다양한 Delegate가 존재합니다. 위 코드 또한 Swift에서 제공하는 `UISearchBarDelegate` 를 사용하고 있습니다.
+View에서 발생하는 이벤트를 Controller에 전달하는 방법은 주로 **Delegate** 패턴을 사용합니다. 실제로 Swift에서는 다양한 Delegate가 존재합니다. 위 코드 또한 UIKit에서 제공하는 `UISearchBarDelegate` 를 사용하고 있습니다.
 
 지금부터 제가 구현한 앱의 흐름을 따라가보도록 하겠습니다.
 
@@ -393,10 +441,10 @@ Controller를 통해 Model과 View를 업데이트하고 이벤트를 처리하�
 MVC 패턴이 위에서 언급한 좋은 아키텍처의 조건을 만족하는지 확인해 보겠습니다.
 
 1. **역할 분배** : 접근하는 방식에 따라 충분히 역할 분배는 가능합니다. 문제는 Controller가 너무 많은 역할을 하고 있습니다. Model도 업데이트하는 동시에 View도 업데이트합니다.
-2. **테스트** : Controller에 너무 많은 의존성이 존재하고 View와 연결되어 있기 때문에 Model에 관련된 코드만 테스트 가능합니다.
+2. **테스트** : Controller에 너무 많은 의존성이 존재하고 View와 연결되어 있기 때문에 Model 업데이트 대한 테스트가 어렵습니다.
 3. **비용** : Controller가 비대해질 수 있기 때문에 유지 보수 측면에서는 많이 비용이 필요하다고 생각합니다. 반면 구현 단계에서 생각했을 때 Controller가 많은 역할 수행이 가능하기 때문에 쉽게 접근이 가능할 것 같습니다.
 
-> NetworkManager에 대한 Mock 테스트를 진행했습니다. 테스트 코드는 MVVM 패턴에서 확인할 수 있습니다.
+> Model에 관련된 테스트는 진행이 가능합니다. 하지만 Model을 업데이트하는 코드는 Controller에 존재하기 때문에 저희는 위에서 언급한 Network Code에 대한 테스트 진행이 가능합니다. 이 부분은 아래 Test 섹션에서 다룰 예정입니다.
 
 다음으로는 MVVM 패턴에 대해 알아보겠습니다.
 
@@ -461,7 +509,7 @@ class Observable<T> {
 
 > Observer 객체를 등록하고 해지하지 않는다면 memory leak이 발생할 수 있습니다.
 
-그렇다면 이제 ViewModel 코드를 확인해 보겠습니다. 먼저 enum을 사용해 View에서 ViewModel에 보낼 수 있는 Action을 정의했습니다.
+그렇다면 이제 ViewModel 코드를 확인해 보겠습니다. 먼저 enum을 사용해 View에서 ViewModel에 보낼 수 있는 Action(이벤트)을 정의했습니다.
 ```swift
 enum Action {
     case searchItem(String)
@@ -469,7 +517,7 @@ enum Action {
     case cancelSearch
 }
 ```
-이 부분 같은 경우는 반드시 필수가 아니라고 생각합니다. 개인적인 생각으로는 View에서 발생할 수 있는 Action을 정의하고 사용하면 View에서 각각의 이벤트가 발생할 때 필요한 함수를 직접 호출하는 게 아닌 하나의 함수에 명확한 파라미터를 제공함으로써 로직을 실행할 수 있다고 판단했습니다.
+이 부분 같은 경우는 반드시 필수가 아니라고 생각합니다. 개인적인 생각으로는 View에서 발생할 수 있는 Action을 정의하고 사용하면 View에서 각각의 이벤트가 발생할 때 필요한 함수를 직접 호출하는 게 아닌 하나의 함수를 통해 Model을 업데이트하는 로직을 실행할 수 있다고 판단했습니다.
 
 ```swift
 class ItemViewModel {
@@ -541,11 +589,9 @@ private extension ItemViewModel {
 }
 ```
 
-실제로 제가 작성한 ViewModel 코드를 보면 실제 로직을 처리하는 함수 `fetchData`, `delete`, `remove`는 View에서 접근이 불가능합니다.
+실제로 제가 작성한 ViewModel 코드를 보면 실제 Model을 업데이트 하는 함수인 `fetchData`, `delete`, `remove`는 View에서 접근이 불가능합니다.
 
-View에서는 `execute` 함수를 호출해 사용자의 Action을 ViewModel에 전달하면 ViewModel에 입력에 따른 비즈니스 로직을 처리하고 데이터(`itemList`)를 업데이트합니다. `itemList` 가 업데이트되면 아까 위에서 확인한 **Observable**의 `notifyObservers` 함수가 호출되며 View가 업데이트됩니다.
-
-MVC 패턴에서 Controller에 있던 Network, Parsing 코드와 Model이 ViewModel에 존재하는 걸 확인할 수 있습니다.
+View에서는 `execute` 함수를 호출해 사용자의 Action을 ViewModel에 전달하면 ViewModel은 Action에 따른 비즈니스 로직을 처리하고 데이터(`itemList`)를 업데이트합니다. `itemList` 가 업데이트되면 아까 위에서 확인한 **Observable**의 `notifyObservers` 함수가 호출되며 View가 업데이트됩니다.
 
 마지막으로 Controller 코드를 확인해 보겠습니다.
 ```swift
@@ -682,8 +728,8 @@ MVC 패턴과의 차이점은 Controller가 ViewModel과 View만 가지고 있�
 
 그럼 MVVM 패턴이 좋은 아키텍처의 조건을 만족하는지 확인해 보겠습니다.
 1. **역할 분배** : MVC 패턴에서 Controller가 많은 역할을 하는 문제점은 해결할 수 있었습니다. 하지만 여전히 ViewModel에서 많은 역할을 수행하고 있다고 생각할 수 있습니다.
-2. **테스트** : ViewModel은 View를 직접적으로 가지고 있지 않기 때문에 테스트 가능합니다. 하지만 적절한 테스트를 진행하기 위해서는 테스트하기 위한 로직에 대해 추상화가 필요합니다.
-3. **비용** : 위 예시는 간단하기 때문에 복잡하지 않다고 생각할 수 있습니다. 하지만 ViewModel과 View는 1:N 관계를 가질 수 있기 때문에 여러 View에서 하나의 ViewModel에 의존하고 있다면 각각 로직에 대해 분리해서 관리하는 것이 효율적일 것입니다. 그렇다면 좀 더 다양한 객체를 관리하고 구현해야 하기 때문에 개발 단계에서는 많은 비용이 필요할 것이라고 생각합니다. 하지만 유지 보수 과정에서는 그만큼 큰 이점이 존재할 것이라고 생각합니다.
+2. **테스트** : ViewModel은 View를 직접적으로 가지고 있지 않기 때문에 테스트 가능합니다. 하지만 너무 많은 의존성을 가지고 있다면 테스트 진행이 힘들 수 있습니다.
+3. **비용** : 위 예시는 간단하기 때문에 복잡하지 않다고 생각할 수 있습니다. 하지만 ViewModel과 View는 1:N 관계를 가질 수 있기 때문에 여러 View에서 하나의 ViewModel에 의존하고 있다면 분리해서 관리하는 것이 효율적일 것입니다. 그렇다면 좀 더 다양한 객체를 관리하고 구현해야 하기 때문에 개발 단계에서는 많은 비용이 필요할 것이라고 생각합니다. 하지만 유지 보수 과정에서는 그만큼 큰 이점이 존재할 것이라고 생각합니다.
 
 > **주의 : 개인적인 의견이 포함되어 있습니다.**
 
