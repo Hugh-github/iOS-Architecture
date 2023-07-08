@@ -8,7 +8,7 @@
 
 |검색|제거|취소|
 |---|---|---|
-|![](https://hackmd.io/_uploads/S1HLv7BKn.gif)|![](https://hackmd.io/_uploads/Sk-vDXHYn.gif)|![](https://hackmd.io/_uploads/SkQOwXrth.gif)|
+|![검색](https://github.com/Hugh-github/iOS-Architecture/assets/102569735/312f7e3f-0e92-4b74-89ef-545ec95f6e69)|![제거](https://github.com/Hugh-github/iOS-Architecture/assets/102569735/f86619ed-7acc-4664-9cd6-e88c135bf480)|![취소](https://github.com/Hugh-github/iOS-Architecture/assets/102569735/f98156ec-3aff-4f1a-a711-bb51315f17d4)|
 ---
 
 ## Architecture
