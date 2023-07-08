@@ -36,7 +36,7 @@ IEEE에서는 소프트웨어 아키텍처에 대해 "소프트웨어를 구성�
 
 ## MVC(Model-View-Controller)
 
-![](https://hackmd.io/_uploads/By2li_ddh.png)
+<img width="776" alt="스크린샷 2023-06-27 오후 9 39 51" src="https://github.com/Hugh-github/iOS-Architecture/assets/102569735/0ab3c91d-1b70-4f70-acb6-402f645a1969">
 
 MVC의 전체적인 흐름을 보자면 View에서 발생한 이벤트를 Controller에 전달합니다. Controller는 이벤트를 통해 Model을 업데이트하고 변경된 데이터를 가지고 View를 업데이트합니다.
 
@@ -404,7 +404,7 @@ MVC 패턴이 위에서 언급한 좋은 아키텍처의 조건을 만족하는�
 ## MVVM(Model - View - ViewModel)
 MVC 패턴의 단점 중 하나는 Controller가 너무 많은 역할을 하기 때문에 비대해지고 View와 연결되어 있기 때문에 테스트를 진행하기 어려웠습니다.
 
-![](https://hackmd.io/_uploads/SyrelFCO3.png)
+<img width="825" alt="스크린샷 2023-07-02 오후 1 41 06" src="https://github.com/Hugh-github/iOS-Architecture/assets/102569735/4d06ca66-f5ab-4ab6-8aec-2d7d4bdf6a14">
 
 MVVM과 MVC 패턴의 차이점을 정리해보겠습니다.
 1. **Binding**
@@ -864,7 +864,7 @@ final class MockNetworkingTests: XCTestCase {
 Network, Parsing을 담당하고 있는 APIServie에 대해 테스트를 진행했습니다. 테스트는 항상 성공하는 상황보다 실패할 수 있는 상황에 대해서도 진행해야 합니다. 저는 여기서 2가지의 테스트를 진행했습니다. 첫 번째는 정상적으로 데이터를 불러왔을 때 예상한 결과와 일치하는지 확인하는 테스트와 만약 서버에서 300번 응답을 보냈을 때 정상적으로 에러를 반환하는지 확인했습니다. (정리 필요)
 
 또한 서버와 통신해 데이터를 가져오는 과정이 비동기적으로 동작하기 때문에 몇가지 설정이 필요합니다. 
-![](https://hackmd.io/_uploads/S1S4MMSY3.png)
+<img width="443" alt="스크린샷 2023-07-07 오후 1 12 18" src="https://github.com/Hugh-github/iOS-Architecture/assets/102569735/dd7677d8-a260-4286-b228-31c5f7544f29">
 
 `XCTestExpectation`은 사진처럼 비동기 테스트에서 예상되는 결과입니다. 해당 객체를 선언한 뒤 `fullfill()` 함수를 호출해 정상적으로 작업이 완료됐는지 확인해야 합니다.
 
@@ -977,14 +977,14 @@ View에서 ViewModel에 전달하는 Event는 3가지 입니다. 각각의 Event
 ---
 ## 참고 자료
 + MVVM
-[MVVM in iOS Swift](https://medium.com/@abhilash.mathur1891/mvvm-in-ios-swift-aa1448a66fb4)
-[iOS Architecture Patterns](https://medium.com/ios-os-x-development/ios-architecture-patterns-ecba4c38de52)
+    + [MVVM in iOS Swift](https://medium.com/@abhilash.mathur1891/mvvm-in-ios-swift-aa1448a66fb4)
+    + [iOS Architecture Patterns](https://medium.com/ios-os-x-development/ios-architecture-patterns-ecba4c38de52)
 
 + MVC
-[MVC in iOS](https://www.kodeco.com/1000705-model-view-controller-mvc-in-ios-a-modern-approach)
-[Cocoa MVC](https://developer.apple.com/library/archive/documentation/General/Conceptual/DevPedia-CocoaCore/MVC.html)
+    + [MVC in iOS](https://www.kodeco.com/1000705-model-view-controller-mvc-in-ios-a-modern-approach)
+    + [Cocoa MVC](https://developer.apple.com/library/archive/documentation/General/Conceptual/DevPedia-CocoaCore/MVC.html)
 
 + Test
-[TestDouble을 알아보자](https://tecoble.techcourse.co.kr/post/2020-09-19-what-is-test-double/)
-[[Swift] Mock 을 이용한 Network Unit Test 하기](https://sujinnaljin.medium.com/swift-mock-%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-network-unit-test-%ED%95%98%EA%B8%B0-a69570defb41)
-[Applying Unit Tests to MVVM with Swift](https://medium.com/@koromikoneo/applying-unit-tests-to-mvvm-with-swift-ba5a79df8a18)
+    + [TestDouble을 알아보자](https://tecoble.techcourse.co.kr/post/2020-09-19-what-is-test-double/)
+    + [[Swift] Mock 을 이용한 Network Unit Test 하기](https://sujinnaljin.medium.com/swift-mock-%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-network-unit-test-%ED%95%98%EA%B8%B0-a69570defb41)
+    + [Applying Unit Tests to MVVM with Swift](https://medium.com/@koromikoneo/applying-unit-tests-to-mvvm-with-swift-ba5a79df8a18)
