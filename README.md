@@ -38,23 +38,22 @@ IEEE에서는 소프트웨어 아키텍처에 대해 "소프트웨어를 구성�
 
 <img width="776" alt="스크린샷 2023-06-27 오후 9 39 51" src="https://github.com/Hugh-github/iOS-Architecture/assets/102569735/0ab3c91d-1b70-4f70-acb6-402f645a1969">
 
-MVC의 전체적인 흐름을 보자면 View에서 발생한 이벤트를 Controller에 전달합니다. Controller는 이벤트를 통해 Model을 업데이트하고 변경된 데이터를 가지고 View를 업데이트합니다.
+MVC 패턴의 가장 중요한 Point는 Model과 View는 서로를 모른다는 점입니다. 그렇기 때문에 Controller를 통해 Model과 View를 업데이트 합니다.
 
-중요한 부분은 Model과 View는 서로에 대해 알지 못합니다. 그렇기 때문에 Controller가 둘 사이의 중제자 역할을 하게 됩니다.
+각 객체의 역할을 정리하자면 View는 UserAction을 받을 수 있고 정보를 제공하는 화면입니다. Controller는 View와 Model 사이를 연결하는 역할을 합니다. Model은 구현에 필요한 데이터와 비즈니스 로직을 가지고 있습니다.
 
-Model의 역할에 대해서 알아보겠습니다. 일반적으로 Model이라면 캡슐화된 데이터를 의미합니다. [MVC in iOS](https://www.kodeco.com/1000705-model-view-controller-mvc-in-ios-a-modern-approach) 예제에서는 Model의 역할을 여러 가지로 구분 짓습니다.
+여기서 Model의 비즈니스 로직은 단순히 데이터를 변화시키는 로직만 포함되는지 궁금증이 생겼습니다. [MVC in iOS](https://www.kodeco.com/1000705-model-view-controller-mvc-in-ios-a-modern-approach) 예제에서는 Model의 역할을 여러 가지로 구분 짓습니다. 
 
 1. **Network code** : 응답 및 에러 처리 같은 네트워크 요청에 개념을 추상화합니다.
 2. **Persistance code** : CoreData와 같은 데이터 베이스에 데이터를 저장합니다.
 3. **Parsing code** : 데이터를 저희가 사용할 Model로 파싱합니다.
 
-일반적으로 생각하는 Model은 DTO입니다. 서버에서 가져오는 데이터는 저희 앱에 바로 사용이 불가능합니다. 사용하고자 하는 값으로 Parsing을 진행해야 합니다. 그렇기 때문에 저도 서버나 로컬 데이터 베이스에서 데이터를 가져오는 코드와 데이터를 Model로 Parsing 하는 코드도 Model에 포함될 수 있다고 생각합니다.
+예제에서는 더 많은 역할에 대해 다루고 있습니다. 저는 위 3개에 역할은 데이터를 불러오고 가공하는 역할을 하기 때문에 Model의 비즈니스 로직에 포함되기 적절하다고 생각합니다.
 
-저는 이번 예제에서 Network Code와 Parsing Code를 각각 구현하고 두 가지 Code를 사용해 저희가 원하는 Model을 얻을 수 있는 객체를 구현해 보도록 하겠습니다.
+이번 예제 코드에서는 Network Code와 Parsing Code를 활용해 MVC 패턴을 구현해 보도록 하겠습니다.
 
-그럼 먼저 Network Code를 확인해 보겠습니다.
+### Network Code
 ```swift
-// Network code
 class NetworkManager {
     static let shared = NetworkManager(urlSession: URLSession.shared)
     
@@ -96,34 +95,10 @@ class NetworkManager {
     }
     
 }
-
-enum NetworkingError: Error {
-    case badRequest
-    case unknownError
-    case clientError
-    case serverError
-    case systemError
-    
-    var description: String {
-        switch self {
-        case .badRequest:
-            return "잘못된 요청"
-        case .unknownError:
-            return "알 수 없는 에러"
-        case .clientError:
-            return "클라이언트 에러"
-        case .serverError:
-            return "서버 에러"
-        case .systemError:
-            return "시스템 에러"
-        }
-    }
-}
 ```
-`NetworkManager`는 서버에 요청을 보내 데이터와 응답을 반환하는 역할을 하고 있습니다. HTTPMethod에 따라 데이터를 가져올 수 도 있고 데이터를 등록할 수도 있습니다. 현재 예제에서는 GET만 사용하기 때문에 큰 문제는 없지만 만약 POST를 진행한다고 해도 `EndPoint` 객체를 이용해 필요한 요청을 생성하면 됩니다.
 
+### Parsing Code
 ```swift
-// Parsing code
 class JSONManager {
     static let shared = JSONManager()
 
@@ -142,20 +117,15 @@ class JSONManager {
         }
     }
 }
+```
+**Network Code**를 활용해 서버에서 json 데이터를 받아올 수 있습니다. 하지만 json 데이터를 그냥 사용할 수 없기 때문에 가공이 필요합니다. **Parsing Code**를 통해 사용할 수 있는 형태로 가공을 해야 합니다.
 
-enum JSONError: Error {
-    case parsingError
-}
+가공한 데이터를 바로 사용할 수 있지만 화면을 구현하는 데 있어 모든 정보가 필요하지는 않습니다. 그렇다면 추가 작업을 통해 우리가 원하는 Model을 만들어 주어야 합니다. 
 
-// Model
-struct Item: Hashable {
-    let title: String
-    let lprice: String
-}
-
+```swift
 struct ItemListDTO: Decodable {
     let items: [ItemDTO]
-
+    
     func toDomain() -> [Item] {
         return self.items.map { item in
             Item(title: item.title, lprice: item.lprice)
@@ -169,182 +139,154 @@ struct ItemDTO: Decodable {
     let lprice: String
     let hprice: String
 }
+
+struct Item: Hashable {
+    let title: String
+    let lprice: String
+}
 ```
-다음은 Parsing Code입니다. 서버에서 받아온 json 데이터를 사용하기 위해서는 디코딩 과정이 필요합니다. `JSONManager`는 디코딩을 통해 데이터를 앱에서 사용할 Model로 매핑을 진행합니다.
+이번 예제에서는 앱을 구현하기 위해 필요한 정보는 `title`과 `lprice`입니다. **ItemDTO**를 그대로 사용하는 것이 아니라 원하는 정보만 가지고 있는 **Item**으로 다시 Mapping을 진행할 수 있습니다.
 
-마지막으로 두 가지 Code를 사용해 서버에 데이터를 요청하고 파싱 한 모델을 가져오는 `Service` 객체를 확인해 보겠습니다.
+이제 화면을 구현하기 위한 Model을 얻었습니다. 하지만 저는 Item 리스트를 관리하기 위해 객체를 하나더 만들었습니다.
 
-```swift 
-class ItemAPIService {
-    var networkManager: NetworkManager
-    private let jsonManager = JSONManager.shared
-    
-    init(
-        networkManager: NetworkManager = NetworkManager.shared
-    ) {
-        self.networkManager = networkManager
+
+**ItemStore**는 Item이 변하면 `NotificationCenter`를 이용해 Controller에 알림을 보냅니다. 또한 Item에 대한 비즈니스 로직을 가지고 있습니다.
+
+```swift
+class ItemStore {
+    private var store: [Item] = [] {
+        didSet {
+            NotificationCenter.default.post(name: Notification.Name("ItemStore"), object: nil)
+        }
     }
     
-    func getItemList(query: RequestQuery) async throws -> [Item]? {
-        let endPoint = EndPoint(
-            base: .naverSearch,
-            query: query,
-            method: .get,
-            header: .init()
-        )
-        
-        let data = try await networkManager.execute(endPoint: endPoint)
-        let modelDTO: ItemListDTO = try jsonManager.decodeData(data)
-            
-        return modelDTO.toDomain()
+    func appendItem(_ item: Item) {
+        self.store.append(item)
+    }
+    
+    func getItemList() -> [Item] {
+        return self.store
+    }
+    
+    func deleteItem(_ index: Int) {
+        self.store.remove(at: index)
+    }
+    
+    func deleteAllItem() {
+        self.store.removeAll()
     }
 }
 ```
-`ItemAPIService`는 앱에서 필요한 데이터를 불러오는 역할을 합니다. `modelDTO.toDomain()`을 보시면 항상 서버에서 오는 데이터가 전부 필요한 경우는 없습니다. 저희는 필요한 데이터를 효과적으로 캡슐화해 사용할 수 있습니다. 즉, `ItemListDTO`를 그대로 사용하는 것이 아닌 필요한 데이터만을 모아 `Item`으로 캡슐화해 사용합니다.
 
-다음은 View 관련된 코드를 확인해 보겠습니다. 예제를 보면 검색한 결과를 TableView의 Cell을 통해 보여주고 있습니다. Cell은 Controller로부터 데이터를 받아 화면을 구성하는 역할을 합니다.
+### View
+
+View를 구현하는 데 있어 확인해야 하는 체크 리스트가 존재합니다.
+
+- **Model layer와의 상호작용 여부, 비즈니스 로직 여부**
+- **UI와 관련된 작업 진행 여부** 
+
+View와 Model은 분리되어 있기 때문에 View는 화면을 구현하는 데 집중해야 합니다.
+
 ```swift
-class ItemCell: UITableViewCell {
-    private let descriptionStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.alignment = .leading
-        stackView.spacing = 5
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-
-        return stackView
+class ItemListView: UIView {
+    let itemListView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .secondarySystemBackground
+        tableView.register(ItemCell.self, forCellReuseIdentifier: "ItemCell")
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        return tableView
     }()
-
-    private let nameLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .headline)
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        return label
-    }()
-
-    private let priceLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        return label
-    }()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-
-        adjustCell()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        setLayout()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
 
-// MARK: Set Cell Content
-extension ItemCell {
-    func setContent(text name: String, _ price: String) {
-        self.nameLabel.text = name
-        self.priceLabel.text = price
-    }
-}
-
-// MARK: Adjust Layout
-private extension ItemCell {
-    func adjustCell() {
-        addView()
-        setLayout()
-    }
-
-    func addView() {
-        addSubview(self.descriptionStackView)
-
-        self.descriptionStackView.addArrangedSubview(self.nameLabel)
-        self.descriptionStackView.addArrangedSubview(self.priceLabel)
-    }
-
+private extension ItemListView {
     func setLayout() {
+        addSubview(itemListView)
+        
         NSLayoutConstraint.activate([
-            self.descriptionStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            self.descriptionStackView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            self.descriptionStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-            self.descriptionStackView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor)
+            self.itemListView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            self.itemListView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            self.itemListView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            self.itemListView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 }
-
 ```
 
-View를 구현하는 데 있어 확인해야 하는 체크 리스트가 존재합니다.
+View에서 발생하는 UserAction은 `Delegate` 패턴을 이용해 Controller에서 처리합니다. `ItemListView`에서 검색한 정보를 List 형태로 제공하기 위한 UITableView가 존재합니다. TableView에서 UserAction이 발생하면 Controller에서 처리하게 됩니다.
 
-- **Model layer와의 상호작용 여부, 비즈니스 로직 여부**
-    - `setContent` 함수를 보면 Model layer와 상호 작용이 아닌 Controller가 보내준 파라미터를 통해 Label의 text를 설정하고 있습니다.
-- **UI와 관련된 작업 진행 여부**
-    - Layout을 설정하는 작업을 진행하고 있습니다.
 
-View는 오로지 화면을 구현하는 데 집중하고 있습니다.
-
-마지막으로 Controller 코드를 확인해 보겠습니다.
-
+### Controller
 ```swift
 final class MVCViewController: UIViewController {
     typealias DataSource = UITableViewDiffableDataSource<Section, Item>
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Item>
-
+    
+    // MARK: View
+    private let listView = ItemListView()
+    
+    // MARK: Model
+    private let itemStore = ItemStore()
+    private let apiService = ItemAPIService()
+    
     enum Section: CaseIterable {
         case list
     }
-
-    // MARK: View
-    private let listView = ItemListView()
-
-    // MARK: Model
-    private var itemList: [Item] = [] {
-        didSet {
-            configureSnapshot()
-        }
-    }
-
-    private let jsonManager = JSONManager.shared
-    private let networkingManager = NetworkingManager.shared
-
-    // MARK: Create Cell
+    
     private lazy var dataSource = DataSource(
         tableView: self.listView.itemListView
     ) { tableView, indexPath, itemIdentifier in
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell", for: indexPath) as? ItemCell else {
             return UITableViewCell()
         }
-
+        
         let name = itemIdentifier.title
         let price = itemIdentifier.lprice
-
+        
         cell.setContent(text: name, price)
-
+        
         return cell
     }
-
+    
     override func loadView() {
         self.view = listView
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         view.backgroundColor = .systemBackground
         self.listView.itemListView.delegate = self
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(configureSnapshot),
+            name: Notification.Name("ItemStore"),
+            object: nil
+        )
         setNavigation()
     }
 }
 
-```
+extension MVCViewController {
+    @objc private func configureSnapshot() {
+        var snapshot = Snapshot()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(itemStore.getItemList(), toSection: .list)
 
-Controller는 View와 Model에 대해 알고 있습니다. 저 같은 경우 **속성 감시자(Observer property)** 를 통해 Model이 업데이트 되면 Controller가 화면을 업데이트 하도록 코드를 구현했습니다.
+        self.dataSource.apply(snapshot)
+    }
+}
 
-화면에서 이벤트를 받아 Cell을 생성해 업데이트하는 과정을 확인해 보겠습니다.
-
-```swift
 private extension MVCViewController {
     func setNavigation() {
         let searchController = UISearchController(searchResultsController: nil)
@@ -353,14 +295,6 @@ private extension MVCViewController {
         
         navigationItem.title = "MVC"
         navigationItem.searchController = searchController
-    }
-    
-    func configureSnapshot() {
-        var snapshot = Snapshot()
-        snapshot.appendSections(Section.allCases)
-        snapshot.appendItems(itemList, toSection: .list)
-        
-        self.dataSource.apply(snapshot)
     }
     
     func configureAlert(_ message: String) {
@@ -385,7 +319,7 @@ extension MVCViewController: UITableViewDelegate {
         let deleteAction = UIContextualAction(style: .normal, title: "Delete") { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
-            self.itemList.remove(at: indexPath.row)
+            self.itemStore.deleteItem(indexPath.row)
             completionHandler(true)
         }
         
@@ -399,18 +333,13 @@ extension MVCViewController: UISearchBarDelegate {
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         guard let text = searchBar.text?.lowercased() else { return }
         
-        let endPoint = EndPoint(
-            base: .naverSearch,
-            query: .init(itemName: text),
-            method: .get,
-            header: .init()
-        )
-        
         Task {
             do {
-                let data = try await networkingManager.execute(endPoint: endPoint)
-                let itemList: ItemListDTO = try jsonManager.decodeData(data)
-                self.itemList = itemList.toDomain()
+                guard let list = try await apiService.getItemList(query: .init(itemName: text)) else { return }
+                
+                list.forEach { item in
+                    self.itemStore.appendItem(item)
+                }
             } catch (let error){
                 guard let error = error as? NetworkingError else { return }
                 
@@ -420,33 +349,19 @@ extension MVCViewController: UISearchBarDelegate {
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        self.itemList.removeAll(keepingCapacity: true)
+        self.itemStore.deleteAllItem()
     }
 }
 
-
 ```
 
-View에서 발생하는 이벤트를 Controller에 전달하는 방법은 주로 **Delegate** 패턴을 사용합니다. 실제로 Swift에서는 다양한 Delegate가 존재합니다. 위 코드 또한 UIKit에서 제공하는 `UISearchBarDelegate` 를 사용하고 있습니다.
-
-지금부터 제가 구현한 앱의 흐름을 따라가보도록 하겠습니다.
-
-1. SearchBar를 통해 이벤트가 발생합니다.
-2. 이벤트를 Controller에 전달합니다.
-3. Controller는 전달받은 입력을 통해 서버 요청에 필요한 객체를 생성하고 응답을 처리해 사용할 Model을 업데이트합니다.
-4. Model이 업데이트되고 Controller는 이를 확인하고 Cell을 생성해 화면을 업데이트합니다.
-
-Controller를 통해 Model과 View를 업데이트하고 이벤트를 처리하는 것을 확인할 수 있습니다.
+Controller는 View의 대리자가 됩니다. UserAction이 발생하면 Model을 업데이트합니다. 그렇기 때문에 View는 Model을 직접 알지 못해도 Model을 변화시킬 수 있습니다. Model이 업데이트 되면 Controller는 알림을 받아 View를 업데이트 합니다.
 
 MVC 패턴이 위에서 언급한 좋은 아키텍처의 조건을 만족하는지 확인해 보겠습니다.
 
-1. **역할 분배** : 접근하는 방식에 따라 충분히 역할 분배는 가능합니다. 문제는 Controller가 너무 많은 역할을 하고 있습니다. Model도 업데이트하는 동시에 View도 업데이트합니다.
-2. **테스트** : Controller에 너무 많은 의존성이 존재하고 View와 연결되어 있기 때문에 Model 업데이트 대한 테스트가 어렵습니다.
+1. **역할 분배** : 접근하는 방식에 따라 Model의 비즈니스 로직의 범위를 설정함으로써 역할 분배가 가능합니다.
+2. **테스트** : Controller가 정상적으로 동작한다면 View가 업데이트됩니다. 하지만 Controller를 테스트하기에는 너무 많은 의존성이 존재합니다. 다양한 View도 알고 있으면 Model Code들도 가지고 있기 때문에 Controller에 대해 테스트를 진행하기 어렵습니다.
 3. **비용** : Controller가 비대해질 수 있기 때문에 유지 보수 측면에서는 많이 비용이 필요하다고 생각합니다. 반면 구현 단계에서 생각했을 때 Controller가 많은 역할 수행이 가능하기 때문에 쉽게 접근이 가능할 것 같습니다.
-
-> Model에 관련된 테스트는 진행이 가능합니다. 하지만 Model을 업데이트하는 코드는 Controller에 존재하기 때문에 저희는 위에서 언급한 Network Code에 대한 테스트 진행이 가능합니다. 이 부분은 아래 Test 섹션에서 다룰 예정입니다.
-
-다음으로는 MVVM 패턴에 대해 알아보겠습니다.
 
 ---
 ## MVVM(Model - View - ViewModel)
