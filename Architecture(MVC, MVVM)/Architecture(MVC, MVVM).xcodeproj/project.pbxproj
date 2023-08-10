@@ -22,6 +22,7 @@
 		725DFFEA2A566E9700E07D13 /* JSONManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72DD88DB2A5511FC0061FA9A /* JSONManager.swift */; };
 		725DFFEB2A566E9A00E07D13 /* ItemDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CE8692A41CB2B00478D89 /* ItemDTO.swift */; };
 		725DFFEC2A566EAF00E07D13 /* ItemAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725DFFE12A56626100E07D13 /* ItemAPIService.swift */; };
+		727E40C82A848DA2004E9495 /* ItemStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727E40C72A848DA2004E9495 /* ItemStore.swift */; };
 		728021672A3C24C700519337 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728021662A3C24C700519337 /* AppDelegate.swift */; };
 		728021692A3C24C700519337 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728021682A3C24C700519337 /* SceneDelegate.swift */; };
 		7280216B2A3C24C700519337 /* MVCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7280216A2A3C24C700519337 /* MVCViewController.swift */; };
@@ -72,6 +73,7 @@
 		725DFFD72A56620100E07D13 /* StubViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubViewModelTest.swift; sourceTree = "<group>"; };
 		725DFFDE2A56622700E07D13 /* StubItemAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubItemAPIService.swift; sourceTree = "<group>"; };
 		725DFFE12A56626100E07D13 /* ItemAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemAPIService.swift; sourceTree = "<group>"; };
+		727E40C72A848DA2004E9495 /* ItemStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemStore.swift; sourceTree = "<group>"; };
 		728021632A3C24C700519337 /* Architecture(MVC, MVVM).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Architecture(MVC, MVVM).app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		728021662A3C24C700519337 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		728021682A3C24C700519337 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -126,6 +128,23 @@
 				725DFFD72A56620100E07D13 /* StubViewModelTest.swift */,
 			);
 			path = StubViewModelTest;
+			sourceTree = "<group>";
+		};
+		727E40C52A848D7E004E9495 /* RawData */ = {
+			isa = PBXGroup;
+			children = (
+				729CE8692A41CB2B00478D89 /* ItemDTO.swift */,
+			);
+			path = RawData;
+			sourceTree = "<group>";
+		};
+		727E40C62A848D89004E9495 /* ViewData */ = {
+			isa = PBXGroup;
+			children = (
+				727E40C72A848DA2004E9495 /* ItemStore.swift */,
+				72DD88DD2A55122F0061FA9A /* Item.swift */,
+			);
+			path = ViewData;
 			sourceTree = "<group>";
 		};
 		7280215A2A3C24C700519337 = {
@@ -194,19 +213,20 @@
 			isa = PBXGroup;
 			children = (
 				72B8F7D02A4D5CB600F74D2E /* View */,
-				72B8F7CF2A4D5CA100F74D2E /* ModelDTO */,
+				72B8F7CF2A4D5CA100F74D2E /* Model */,
 				72BCA1DA2A401E5B0013AA1A /* Networking */,
 				72DD88DA2A5511EE0061FA9A /* Parsing */,
 			);
 			path = Common;
 			sourceTree = "<group>";
 		};
-		72B8F7CF2A4D5CA100F74D2E /* ModelDTO */ = {
+		72B8F7CF2A4D5CA100F74D2E /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				729CE8692A41CB2B00478D89 /* ItemDTO.swift */,
+				727E40C62A848D89004E9495 /* ViewData */,
+				727E40C52A848D7E004E9495 /* RawData */,
 			);
-			path = ModelDTO;
+			path = Model;
 			sourceTree = "<group>";
 		};
 		72B8F7D02A4D5CB600F74D2E /* View */ = {
@@ -233,7 +253,6 @@
 			isa = PBXGroup;
 			children = (
 				72DD88DB2A5511FC0061FA9A /* JSONManager.swift */,
-				72DD88DD2A55122F0061FA9A /* Item.swift */,
 			);
 			path = Parsing;
 			sourceTree = "<group>";
@@ -403,6 +422,7 @@
 				72C5D0C82A458B4E00F5C92B /* ItemCell.swift in Sources */,
 				72DD88DE2A55122F0061FA9A /* Item.swift in Sources */,
 				729894492A4E889E0041FDD3 /* ItemViewModel.swift in Sources */,
+				727E40C82A848DA2004E9495 /* ItemStore.swift in Sources */,
 				7280216B2A3C24C700519337 /* MVCViewController.swift in Sources */,
 				728021672A3C24C700519337 /* AppDelegate.swift in Sources */,
 				725DFFE22A56626100E07D13 /* ItemAPIService.swift in Sources */,

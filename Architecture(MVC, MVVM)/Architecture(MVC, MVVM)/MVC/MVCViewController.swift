@@ -19,11 +19,8 @@ final class MVCViewController: UIViewController {
     private let listView = ItemListView()
     
     // MARK: Model
-    private var itemList: [Item] = [] {
-        didSet {
-            configureSnapshot()
-        }
-    }
+    private let itemStore = ItemStore()
+    
     
     // MARK: Network & Parsing Code
     private let apiService = ItemAPIService()
@@ -52,7 +49,23 @@ final class MVCViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         self.listView.itemListView.delegate = self
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(configureSnapshot),
+            name: Notification.Name("ItemStore"),
+            object: nil
+        )
         setNavigation()
+    }
+}
+
+extension MVCViewController {
+    @objc private func configureSnapshot() {
+        var snapshot = Snapshot()
+        snapshot.appendSections(Section.allCases)
+        snapshot.appendItems(itemStore.getItemList(), toSection: .list)
+
+        self.dataSource.apply(snapshot)
     }
 }
 
@@ -64,14 +77,6 @@ private extension MVCViewController {
         
         navigationItem.title = "MVC"
         navigationItem.searchController = searchController
-    }
-    
-    func configureSnapshot() {
-        var snapshot = Snapshot()
-        snapshot.appendSections(Section.allCases)
-        snapshot.appendItems(itemList, toSection: .list)
-        
-        self.dataSource.apply(snapshot)
     }
     
     func configureAlert(_ message: String) {
@@ -96,7 +101,7 @@ extension MVCViewController: UITableViewDelegate {
         let deleteAction = UIContextualAction(style: .normal, title: "Delete") { [weak self] (action, view, completionHandler) in
             guard let self = self else { return }
             
-            self.itemList.remove(at: indexPath.row)
+            self.itemStore.deleteItem(indexPath.row)
             completionHandler(true)
         }
         
@@ -113,7 +118,10 @@ extension MVCViewController: UISearchBarDelegate {
         Task {
             do {
                 guard let list = try await apiService.getItemList(query: .init(itemName: text)) else { return }
-                self.itemList = list
+                
+                list.forEach { item in
+                    self.itemStore.appendItem(item)
+                }
             } catch (let error){
                 guard let error = error as? NetworkingError else { return }
                 
@@ -123,6 +131,6 @@ extension MVCViewController: UISearchBarDelegate {
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        self.itemList.removeAll(keepingCapacity: true)
+        self.itemStore.deleteAllItem()
     }
 }
