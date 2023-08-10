@@ -14,14 +14,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         self.window = UIWindow(windowScene: windowScene)
         
-        let dailyViewController = MVCViewController()
-        let weeklyViewController = MVVMViewController()
+        let mvcViewController = MVCViewController()
+        let mvvmViewController = MVVMViewController()
         
-        let firstViewController = UINavigationController(rootViewController: dailyViewController)
+        let firstViewController = UINavigationController(rootViewController: mvcViewController)
         firstViewController.tabBarItem.title = "MVC"
         firstViewController.tabBarItem.image = UIImage(systemName: "magnifyingglass")
         
-        let secondViewController = UINavigationController(rootViewController: weeklyViewController)
+        let secondViewController = UINavigationController(rootViewController: mvvmViewController)
         secondViewController.tabBarItem.title = "MVVM"
         secondViewController.tabBarItem.image = UIImage(systemName: "magnifyingglass")
 
